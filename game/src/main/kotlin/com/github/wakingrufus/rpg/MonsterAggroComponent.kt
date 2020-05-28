@@ -7,6 +7,7 @@ import com.almasb.fxgl.entity.SpawnData
 import com.almasb.fxgl.entity.component.Component
 import com.almasb.fxgl.entity.component.Required
 import com.almasb.fxgl.entity.components.TransformComponent
+import com.almasb.fxgl.entity.getComponent
 import com.github.wakingrufus.rpg.entities.EntityType
 
 @Required(TransformComponent::class)

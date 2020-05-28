@@ -3,6 +3,7 @@ package com.github.wakingrufus.rpg
 import com.almasb.fxgl.dsl.FXGL.Companion.getUIFactory
 import com.almasb.fxgl.dsl.getGameState
 import com.almasb.fxgl.entity.Entity
+import com.almasb.fxgl.entity.getComponent
 import com.github.wakingrufus.collections.bind
 import com.github.wakingrufus.rpg.battle.BattleComponent
 import javafx.collections.ObservableList

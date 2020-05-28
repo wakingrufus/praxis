@@ -6,6 +6,7 @@ import com.almasb.fxgl.dsl.*
 import com.almasb.fxgl.entity.Entity
 import com.almasb.fxgl.entity.SpawnData
 import com.almasb.fxgl.entity.component.Component
+import com.almasb.fxgl.entity.getComponent
 import com.almasb.fxgl.logging.Logger
 import com.github.wakingrufus.rpg.*
 import com.github.wakingrufus.rpg.entities.EntityType

@@ -3,8 +3,8 @@ package com.github.wakingrufus.rpg.battle
 import com.almasb.fxgl.dsl.getGameState
 import com.almasb.fxgl.entity.Entity
 import com.almasb.fxgl.entity.component.Component
+import com.almasb.fxgl.entity.getComponent
 import javafx.collections.FXCollections
-import com.github.wakingrufus.rpg.getComponent
 
 
 class BattleComponent(val name: String, val maxHp: Int, var speed: Int, var currentHp : Int = maxHp) : Component() {

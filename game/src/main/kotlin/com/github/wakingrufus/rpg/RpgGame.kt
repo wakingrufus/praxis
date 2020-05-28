@@ -5,6 +5,7 @@ import com.almasb.fxgl.app.GameSettings
 import com.almasb.fxgl.app.MenuItem
 import com.almasb.fxgl.dsl.*
 import com.almasb.fxgl.entity.Entity
+import com.almasb.fxgl.entity.getComponent
 import com.almasb.fxgl.input.Input
 import com.almasb.fxgl.input.UserAction
 import com.almasb.fxgl.logging.Logger
@@ -14,7 +15,6 @@ import com.github.wakingrufus.rpg.battle.BattleEngine
 import com.github.wakingrufus.rpg.battle.BattleStateKeys
 import com.github.wakingrufus.rpg.entities.EntityType
 import com.github.wakingrufus.rpg.entities.MyEntityFactory
-import javafx.event.Event
 import javafx.scene.input.KeyCode
 import java.util.*
 import java.util.function.BiConsumer

@@ -3,10 +3,9 @@ package com.github.wakingrufus.rpg.battle.ability
 import com.almasb.fxgl.entity.component.Component
 import com.almasb.fxgl.entity.component.Required
 import com.almasb.fxgl.entity.component.RequiredComponents
-import com.github.wakingrufus.rpg.battle.BattleActionChoice
+import com.almasb.fxgl.entity.getComponent
 import com.github.wakingrufus.rpg.battle.HealPowerComponent
 import com.github.wakingrufus.rpg.battle.action
-import com.github.wakingrufus.rpg.getComponent
 
 @RequiredComponents(
         Required(AbilitiesComponent::class),

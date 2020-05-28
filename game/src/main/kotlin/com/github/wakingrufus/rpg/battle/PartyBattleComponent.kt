@@ -1,29 +1,27 @@
 package com.github.wakingrufus.rpg.battle
 
-import com.almasb.fxgl.dsl.*
-import com.almasb.fxgl.dsl.FXGL.Companion.getDialogFactoryService
-import com.almasb.fxgl.dsl.FXGL.Companion.getDialogService
+import com.almasb.fxgl.dsl.getGameScene
+import com.almasb.fxgl.dsl.getGameState
+import com.almasb.fxgl.dsl.getGameWorld
+import com.almasb.fxgl.dsl.getUIFactoryService
 import com.almasb.fxgl.entity.component.Component
 import com.almasb.fxgl.entity.component.Required
 import com.almasb.fxgl.entity.component.RequiredComponents
+import com.almasb.fxgl.entity.getComponent
 import com.almasb.fxgl.logging.Logger
 import com.github.wakingrufus.rpg.battle.ability.AbilitiesComponent
 import com.github.wakingrufus.rpg.entities.EntityType
-import com.github.wakingrufus.rpg.getComponent
-import javafx.event.EventHandler
 import javafx.scene.Node
 import javafx.scene.layout.Background
 import javafx.scene.layout.BackgroundFill
 import javafx.scene.layout.VBox
 import javafx.scene.paint.Color
-import javafx.scene.paint.Paint
 
 @RequiredComponents(
         Required(BattleComponent::class),
         Required(AbilitiesComponent::class))
 class PartyBattleComponent : Component() {
     private val log = Logger.get(javaClass)
-    lateinit var handler: EventHandler<ActionChoiceEvent>
     lateinit var node: Node
 
     fun triggerAction(battleActionChoice: BattleActionChoice) {
@@ -44,7 +42,6 @@ class PartyBattleComponent : Component() {
         }
         getGameState().setValue(BattleStateKeys.activePartyMember, false)
         getGameScene().removeUINode(node)
-        getEventBus().removeEventHandler(ActionChoiceEvent.ANY, this.handler)
     }
 
     @Override
@@ -75,15 +72,6 @@ class PartyBattleComponent : Component() {
                 }
 
                 getGameScene().addUINode(node)
-                handler = EventHandler<ActionChoiceEvent> { event: ActionChoiceEvent ->
-                    if (event.choice <= abilities.size) {
-                        val selectedAction = abilities[event.choice - 1]
-                        triggerAction(selectedAction)
-                        getEventBus().removeEventHandler(ActionChoiceEvent.ANY, this.handler)
-                    } else {
-                        log.warning("Invalid choice")
-                    }
-                }
             }
         }
     }

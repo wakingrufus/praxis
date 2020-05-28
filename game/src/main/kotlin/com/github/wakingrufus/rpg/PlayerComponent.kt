@@ -7,6 +7,7 @@ import com.almasb.fxgl.entity.components.TypeComponent
 import com.github.wakingrufus.rpg.entities.EntityType
 import javafx.geometry.Point2D
 import kotlin.math.withSign
+import com.almasb.fxgl.entity.getComponent
 
 class PlayerComponent : Component() {
 
