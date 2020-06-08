@@ -2,6 +2,7 @@ package com.github.wakingrufus.rpg.battle
 
 import com.almasb.fxgl.entity.Entity
 import com.almasb.fxgl.entity.GameWorld
+import com.almasb.fxgl.entity.getComponent
 import com.github.wakingrufus.rpg.entities.EntityType
 
 interface BattleAi {
@@ -11,8 +12,9 @@ interface BattleAi {
 class Attacker : BattleAi {
 
     override fun decideNextAction(self: Entity, gameWorld: GameWorld): BattleAction {
-        val action = action("attack"){
+        val action = action("attack") {
             targetEffect { it.takeDamage(1, DamageType.MELEE) }
+            performerEffect { it.entity.getComponent<BattleAnimationComponent>().attack() }
         }
         return action.toBattleAction(performer = self.battleComponent(),
                 target = gameWorld.getEntitiesByType(EntityType.PARTY).random().battleComponent(),

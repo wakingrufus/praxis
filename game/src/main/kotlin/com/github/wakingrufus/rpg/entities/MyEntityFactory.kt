@@ -1,8 +1,6 @@
 package com.github.wakingrufus.rpg.entities
 
 import com.almasb.fxgl.dsl.FXGL
-import com.almasb.fxgl.dsl.getAssetLoader
-import com.almasb.fxgl.dsl.getGameScene
 import com.almasb.fxgl.entity.Entity
 import com.almasb.fxgl.entity.EntityFactory
 import com.almasb.fxgl.entity.SpawnData
@@ -10,14 +8,14 @@ import com.almasb.fxgl.entity.Spawns
 import com.almasb.fxgl.logging.Logger
 import com.almasb.fxgl.physics.BoundingShape
 import com.almasb.fxgl.physics.HitBox
-import com.github.wakingrufus.rpg.MonsterAggroComponent
+import com.github.wakingrufus.rpg.field.MonsterAggroComponent
 import com.github.wakingrufus.rpg.PlayerComponent
 import com.github.wakingrufus.rpg.field.SpawnerComponent
 import com.github.wakingrufus.rpg.battle.*
 import com.github.wakingrufus.rpg.battle.ability.AbilitiesComponent
 import com.github.wakingrufus.rpg.battle.ability.PrayComponent
 import com.github.wakingrufus.rpg.battle.ability.WeaponComponent
-import javafx.scene.image.ImageView
+import com.github.wakingrufus.rpg.field.FieldAnimationComponent
 import javafx.scene.paint.Color
 import javafx.scene.shape.Rectangle
 
@@ -53,33 +51,25 @@ class MyEntityFactory : EntityFactory {
         return FXGL.entityBuilder()
                 .type(EntityType.ENEMY)
                 .at(data.x, data.y)
-                // 1. OR let the view generate it from view data
                 .bbox(HitBox(BoundingShape.box(40.0, 40.0)))
-                .view(ImageView(getAssetLoader().loadImage(data.get("sprite"))).apply {
-                    fitHeight = 64.0
-                    fitWidth = 64.0
-                })
-                // 2. make it collidable
                 .collidable()
                 .with(MonsterAggroComponent(data.get("name"), data.get("party")))
+                .with(FieldAnimationComponent(data.get("sprite")))
                 .build()
     }
-
-    @Spawns("enemyPartyMember")
-    fun enemyPartyMember(data: SpawnData): Entity {
-        return FXGL.entityBuilder()
-                .type(EntityType.ENEMY_PARTY)
-                .at(data.x, data.y)
-                .zIndex(2)
-                .view(ImageView(getAssetLoader().loadImage(data.get("sprite"))).apply {
-                    fitHeight = 64.0
-                    fitWidth = 64.0
-                })
-                .with(BattleComponent(data.get("name"), data.get("maxHp"), data.get("speed")))
-                .with(BattleAiComponent(Attacker()))
-                .with(EnemyBattleComponent())
-                .build()
-    }
+//
+//    @Spawns("enemyPartyMember")
+//    fun enemyPartyMember(data: SpawnData): Entity {
+//        return FXGL.entityBuilder()
+//                .type(EntityType.ENEMY_PARTY)
+//                .at(data.x, data.y)
+//                .zIndex(2)
+//                .with(BattleComponent(data.get("name"), data.get("maxHp"), data.get("speed")))
+//                .with(BattleAiComponent(Attacker()))
+//                .with(EnemyBattleComponent())
+//                .with(BattleAnimationComponent(data.get("sprite"), Orientation.LEFT))
+//                .build()
+//    }
 
     @Spawns("wall")
     fun newWall(data: SpawnData): Entity {

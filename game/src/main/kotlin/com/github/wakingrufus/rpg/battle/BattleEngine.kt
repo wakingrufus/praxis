@@ -10,10 +10,8 @@ import com.almasb.fxgl.entity.getComponent
 import com.almasb.fxgl.logging.Logger
 import com.github.wakingrufus.rpg.*
 import com.github.wakingrufus.rpg.entities.EntityType
+import com.github.wakingrufus.rpg.field.MonsterAggroComponent
 import com.github.wakingrufus.rpg.field.MonsterDespawnEvent
-import javafx.collections.FXCollections
-import javafx.collections.ObservableList
-import javafx.scene.Node
 import javafx.scene.image.ImageView
 
 class BattleEngine(val gameScene: GameScene, val enemy: Entity) : Component() {
@@ -33,10 +31,15 @@ class BattleEngine(val gameScene: GameScene, val enemy: Entity) : Component() {
         enemy.getComponent<MonsterAggroComponent>().enemies
                 .also { log.info("fighting ${it.size} monsters") }
                 .mapIndexed { index, spawnData ->
-                    gameScene.gameWorld.spawn("enemyPartyMember",
-                            SpawnData(1500.0, 500.0 + (index * 50)).apply {
-                                spawnData.data.forEach { this.put(it.key, it.value) }
-                            })
+                    FXGL.entityBuilder()
+                            .type(EntityType.ENEMY_PARTY)
+                            .at(1500.0, 500.0 + (index * 50))
+                            .zIndex(2)
+                            .with(BattleComponent(spawnData.get("name"), spawnData.get("maxHp"), spawnData.get("speed")))
+                            .with(BattleAiComponent(Attacker()))
+                            .with(EnemyBattleComponent())
+                            .with(BattleAnimationComponent(spawnData.get("sprite"), Orientation.LEFT))
+                            .buildAndAttach()
                 }
        val partyEntity = gameScene.gameWorld.spawn("partyMember", SpawnData(100.0, 500.0).apply {
             put("width", 40.0)

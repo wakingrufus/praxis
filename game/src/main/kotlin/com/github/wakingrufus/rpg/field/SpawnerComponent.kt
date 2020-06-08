@@ -1,11 +1,14 @@
 package com.github.wakingrufus.rpg.field
 
+import com.almasb.fxgl.dsl.FXGL
 import com.almasb.fxgl.dsl.getEventBus
-import com.almasb.fxgl.dsl.getGameWorld
 import com.almasb.fxgl.entity.Entity
 import com.almasb.fxgl.entity.SpawnData
 import com.almasb.fxgl.entity.component.Component
 import com.almasb.fxgl.logging.Logger
+import com.almasb.fxgl.physics.BoundingShape
+import com.almasb.fxgl.physics.HitBox
+import com.github.wakingrufus.rpg.entities.EntityType
 import javafx.event.EventHandler
 
 class SpawnerComponent(val spawnData: SpawnData) : Component() {
@@ -17,16 +20,21 @@ class SpawnerComponent(val spawnData: SpawnData) : Component() {
 
     @Override
     override fun onUpdate(tpf: Double) {
-    //    if (spawnedEntity?.isActive != true) {
-            respawnTimer += tpf
-            if (respawnTimer > spawnData.get<Double>("respawnTime")) {
-                respawnTimer = 0.0
-                log.info("spawning new ${spawnData.get<String>("name")}")
-                spawnedEntity = getGameWorld().spawn("enemy", spawnData)
-                pause()
-                getEventBus().addEventHandler(MonsterDespawnEvent.ANY, handler)
-            }
-    //    }
+        respawnTimer += tpf
+        if (respawnTimer > spawnData.get<Double>("respawnTime")) {
+            respawnTimer = 0.0
+            log.info("spawning new ${spawnData.get<String>("name")}")
+            spawnedEntity = FXGL.entityBuilder()
+                    .type(EntityType.ENEMY)
+                    .at(spawnData.x, spawnData.y)
+                    .bbox(HitBox(BoundingShape.box(40.0, 40.0)))
+                    .collidable()
+                    .with(FieldAnimationComponent(spawnData.get("sprite")))
+                    .with(MonsterAggroComponent(spawnData.get("name"), spawnData.get("party")))
+                    .buildAndAttach()
+            pause()
+            getEventBus().addEventHandler(MonsterDespawnEvent.ANY, handler)
+        }
     }
 
     init {
