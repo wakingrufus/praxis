@@ -16,46 +16,46 @@ import javafx.collections.ObservableList
 import javafx.scene.Node
 import javafx.scene.image.ImageView
 
-class BattleEngine(val gameScene: GameScene) : Component() {
+class BattleEngine(val gameScene: GameScene, val enemy: Entity) : Component() {
     private val log = Logger.get(javaClass)
-    private val enemies: ObservableList<Entity> = FXCollections.observableArrayList()
-    private val party: ObservableList<Entity> = FXCollections.observableArrayList()
-    private val enemyStatsUi: Node = enemyStats(enemies)
-    private val partyStatsUi: Node = partyStats(party)
     private lateinit var worldEnemy: Entity
+    private lateinit var battleView: GameView
 
-    fun startBattle(enemy: Entity) {
-        getGameScene().addUINode(enemyStatsUi)
-        getGameScene().addUINode(partyStatsUi)
+    override fun onAdded() {
         gameScene.gameWorld.properties.setValue("battle", true)
         gameScene.gameWorld.removeEntity(enemy)
         worldEnemy = enemy
-        gameScene.addGameView(GameView(ImageView(getAssetLoader().loadImage("battle_valley.png")).apply {
+        battleView = GameView(ImageView(getAssetLoader().loadImage("battle_valley.png")).apply {
             fitWidth = 1920.0
             fitHeight = 800.0
-        }, 1))
-        enemies.addAll(enemy.getComponent<MonsterAggroComponent>().enemies
+        }, 1)
+        gameScene.addGameView(battleView)
+        enemy.getComponent<MonsterAggroComponent>().enemies
                 .also { log.info("fighting ${it.size} monsters") }
                 .mapIndexed { index, spawnData ->
                     gameScene.gameWorld.spawn("enemyPartyMember",
                             SpawnData(1500.0, 500.0 + (index * 50)).apply {
                                 spawnData.data.forEach { this.put(it.key, it.value) }
                             })
-                })
-        party.addAll(gameScene.gameWorld.spawn("partyMember", SpawnData(100.0, 500.0).apply {
+                }
+       val partyEntity = gameScene.gameWorld.spawn("partyMember", SpawnData(100.0, 500.0).apply {
             put("width", 40.0)
             put("height", 40.0)
             put("name", "player")
             put("maxHp", 100)
             put("speed", 15)
             put("weapon", Weapon("Dagger", 10, DamageType.MELEE))
-        }))
-        gameScene.viewport.bindToEntity(party.first(), party.first().x, party.first().y)
+            put("partyOrder", 0)
+        })
+        gameScene.viewport.bindToEntity(partyEntity, partyEntity.x, partyEntity.y)
         getGameState().intProperty(BattleStateKeys.turn).set(1)
     }
 
     @Override
     override fun onUpdate(tpf: Double) {
+        if(getGameWorld().getEntitiesByType(EntityType.ENEMY_PARTY).isEmpty()){
+            getGameWorld().removeEntity(this.entity)
+        }
         val allBattleEntities = getGameWorld().getEntitiesByType(EntityType.PARTY)
                 .plus(getGameWorld().getEntitiesByType(EntityType.ENEMY_PARTY))
         val currentTurnBattleComponents = allBattleEntities
@@ -72,10 +72,14 @@ class BattleEngine(val gameScene: GameScene) : Component() {
         }
     }
 
-    fun endBattle() {
-        gameScene.removeUINode(enemyStatsUi)
-        gameScene.removeUINode(partyStatsUi)
+    override fun onRemoved() {
+        log.info("Victory!")
         getEventBus().fireEvent(MonsterDespawnEvent(MonsterDespawnEvent.ANY, worldEnemy))
+        getGameWorld().getEntitiesByType(EntityType.PARTY)
+                .forEach { getGameWorld().removeEntities(it) }
+        gameScene.removeGameView(battleView)
+        getGameState().setValue(BattleStateKeys.activePartyMember, false)
+        getGameScene().viewport.bindToEntity(getGameWorld().getEntitiesByType(EntityType.PLAYER).first(), 1000.0, 500.0)
     }
 }
 

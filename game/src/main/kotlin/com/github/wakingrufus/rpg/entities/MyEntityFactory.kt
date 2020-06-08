@@ -48,15 +48,6 @@ class MyEntityFactory : EntityFactory {
                 .build()
     }
 
-    @Spawns("battle")
-    fun battle(data: SpawnData): Entity {
-        return FXGL.entityBuilder()
-                .type(EntityType.BATTLE)
-                .at(data.x, data.y)
-                .with(BattleEngine(getGameScene()))
-                .build()
-    }
-
     @Spawns("enemy")
     fun newEnemy(data: SpawnData): Entity {
         return FXGL.entityBuilder()
@@ -86,6 +77,7 @@ class MyEntityFactory : EntityFactory {
                 })
                 .with(BattleComponent(data.get("name"), data.get("maxHp"), data.get("speed")))
                 .with(BattleAiComponent(Attacker()))
+                .with(EnemyBattleComponent())
                 .build()
     }
 
@@ -123,7 +115,7 @@ class MyEntityFactory : EntityFactory {
                 .with(AbilitiesComponent())
                 .with(WeaponComponent(data.get("weapon")))
                 .with(PrayComponent())
-                .with(PartyBattleComponent())
+                .with(PartyBattleComponent(data.get("partyOrder")))
                 .build()
     }
 }

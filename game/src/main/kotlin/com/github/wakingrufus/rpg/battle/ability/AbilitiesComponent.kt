@@ -15,10 +15,4 @@ class AbilitiesComponent : Component() {
     fun getAbilities(): List<BattleActionChoice> {
         return abilities
     }
-
-    fun battleActions(): List<BattleActionChoice> {
-        return listOf(action("Pray") {
-            alliesEffect { target -> target.heal(entity.getComponent<HealPowerComponent>().effectiveHealPower()) }
-        })
-    }
 }
