@@ -1,19 +1,20 @@
 package com.github.wakingrufus.rpg.battle
 
-import com.almasb.fxgl.dsl.*
+import com.almasb.fxgl.dsl.FXGL
+import com.almasb.fxgl.dsl.getGameScene
+import com.almasb.fxgl.dsl.getGameState
+import com.almasb.fxgl.dsl.getGameWorld
 import com.almasb.fxgl.entity.component.Component
 import com.almasb.fxgl.entity.component.Required
 import com.almasb.fxgl.entity.component.RequiredComponents
 import com.almasb.fxgl.entity.getComponent
 import com.almasb.fxgl.logging.Logger
-import com.github.wakingrufus.collections.bind
 import com.github.wakingrufus.rpg.battle.ability.AbilitiesComponent
 import com.github.wakingrufus.rpg.entities.EntityType
 import javafx.scene.Node
 import javafx.scene.layout.Background
 import javafx.scene.layout.BackgroundFill
 import javafx.scene.layout.HBox
-import javafx.scene.layout.VBox
 import javafx.scene.paint.Color
 import javafx.scene.text.Text
 
@@ -31,21 +32,31 @@ class PartyBattleComponent(val playerOrder: Int) : Component() {
     fun triggerAction(battleActionChoice: BattleActionChoice) {
         log.info("action chosen ${battleActionChoice.name}")
         if (battleActionChoice.ability.requiresTarget) {
-            entity.battleComponent().queueAction(battleActionChoice.toBattleAction(
-                    performer = entity.battleComponent(),
-                    target = getGameWorld().getEntitiesByType(EntityType.ENEMY_PARTY).random().battleComponent(),
-                    allies = getGameWorld().getEntitiesByType(EntityType.PARTY).map { it.battleComponent() },
-                    enemies = getGameWorld().getEntitiesByType(EntityType.ENEMY_PARTY).map { it.battleComponent() })
-            )
+            val targetChooserNode = battleDialog {
+                getGameWorld().getEntitiesByType(EntityType.ENEMY_PARTY).forEach {
+                    choice(it.battleComponent().name) {
+                        entity.battleComponent().queueAction(battleActionChoice.toBattleAction(
+                                performer = entity.battleComponent(),
+                                target = it.battleComponent(),
+                                allies = getGameWorld().getEntitiesByType(EntityType.PARTY).map { it.battleComponent() },
+                                enemies = getGameWorld().getEntitiesByType(EntityType.ENEMY_PARTY).map { it.battleComponent() })
+                        )
+                        getGameState().setValue(BattleStateKeys.activePartyMember, false)
+                    }
+                }
+            }
+            getGameScene().removeUINode(node)
+            getGameScene().addUINode(targetChooserNode)
         } else {
             entity.battleComponent().queueAction(battleActionChoice.toBattleAction(
                     performer = entity.battleComponent(),
                     allies = getGameWorld().getEntitiesByType(EntityType.PARTY).map { it.battleComponent() },
                     enemies = getGameWorld().getEntitiesByType(EntityType.ENEMY_PARTY).map { it.battleComponent() })
             )
+            getGameState().setValue(BattleStateKeys.activePartyMember, false)
+            getGameScene().removeUINode(node)
         }
-        getGameState().setValue(BattleStateKeys.activePartyMember, false)
-        getGameScene().removeUINode(node)
+
     }
 
     override fun onUpdate(tpf: Double) {
@@ -56,7 +67,7 @@ class PartyBattleComponent(val playerOrder: Int) : Component() {
             infoNode = HBox().apply {
                 background = Background(BackgroundFill(Color.BLACK, null, null))
                 translateX = 960.0
-                translateY = 800.0 + (playerOrder*50)
+                translateY = 800.0 + (playerOrder * 50)
                 minWidth = 480.0
                 maxWidth = 480.0
                 minHeight = 40.0
@@ -74,27 +85,14 @@ class PartyBattleComponent(val playerOrder: Int) : Component() {
             if (!getGameState().getBoolean(BattleStateKeys.activePartyMember)) {
                 val abilities = entity.getComponent<AbilitiesComponent>().getAbilities()
                 getGameState().setValue(BattleStateKeys.activePartyMember, true)
-                node = VBox().apply {
-                    children.add(getUIFactoryService().newText(entity.battleComponent().name))
-                    children.addAll(*abilities
-                            .map { ability ->
-                                getUIFactoryService().newButton(ability.name).apply {
-                                    setOnAction {
-                                        triggerAction(ability)
-                                    }
-                                }
-                            }.toTypedArray()
-                    ).apply {
-                        translateX = 0.0
-                        translateY = 800.0
-                        minWidth = 480.0
-                        maxWidth = 480.0
-                        minHeight = 280.0
-                        maxHeight = 280.0
-                        background = Background(BackgroundFill(Color.BLACK, null, null))
+                node = battleDialog {
+                    title(entity.battleComponent().name)
+                    abilities.forEach { ability ->
+                        choice(ability.name) {
+                            triggerAction(ability)
+                        }
                     }
                 }
-
                 getGameScene().addUINode(node)
             }
         }
