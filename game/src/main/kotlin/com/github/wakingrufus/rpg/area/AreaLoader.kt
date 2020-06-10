@@ -9,10 +9,13 @@ class AreaLoader(val gameWorld: GameWorld) {
         areaData[name]?.let { area ->
             FXGL.setLevelFromMap(area.map)
             area.objects.forEach {
-                gameWorld.spawn("rectangle",it)
+                gameWorld.spawn("rectangle", it)
             }
             area.spawners.forEach {
-                gameWorld.spawn("spawner",it)
+                gameWorld.spawn("spawner", it)
+            }
+            area.npcs.forEach {
+                gameWorld.spawn("npc", it)
             }
         }
     }

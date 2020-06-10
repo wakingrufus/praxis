@@ -65,6 +65,6 @@ class FieldMovementComponent(val speed: Int) : Component() {
         return FXGL.getGameScene().viewport.visibleArea.contains(newPosition) &&
                 FXGL.getGameWorld().getEntitiesInRange(Rectangle2D(minX, minY, width, height))
                         .map { it.getComponent<TypeComponent>() }
-                        .none { type -> type.isType(EntityType.OBJECT) }
+                        .none { type -> type.isType(EntityType.OBJECT) || type.isType(EntityType.NPC) }
     }
 }

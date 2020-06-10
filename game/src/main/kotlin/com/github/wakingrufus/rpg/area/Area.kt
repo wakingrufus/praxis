@@ -6,20 +6,25 @@ import com.github.wakingrufus.rpg.entities.battleParty
 import com.github.wakingrufus.rpg.entities.name
 import javafx.scene.paint.Color
 
-data class Area(val name: String, val map: String, val spawners: List<SpawnData>, val objects: List<SpawnData>)
+data class Area(
+        val name: String,
+        val map: String,
+        val spawners: List<SpawnData>,
+        val objects: List<SpawnData>,
+        val npcs: List<SpawnData>)
 
 fun area(name: String, map: String, builder: AreaBuilder.() -> Unit): Area {
-    val builder = AreaBuilder().apply(builder)
-    return Area(name, map, builder.spawners, builder.objects)
+    return AreaBuilder(name, map).apply(builder).build()
 }
 
 
-class AreaBuilder {
+class AreaBuilder(val name: String, val map: String) {
     val spawners: MutableList<SpawnData> = mutableListOf()
     val objects: MutableList<SpawnData> = mutableListOf()
+    val npcs: MutableList<SpawnData> = mutableListOf()
 
     fun spawn(name: String, sprite: String, x: Double, y: Double,
-              aggroRange: Int, speed : Int,
+              aggroRange: Int, speed: Int,
               respawnTime: Double,
               party: BattlePartyBuilder.() -> Unit) {
         spawners.add(SpawnData(x, y).apply {
@@ -28,7 +33,14 @@ class AreaBuilder {
             put("aggroRange", aggroRange)
             put("speed", speed)
             battleParty(party)
-            put("respawnTime",respawnTime)
+            put("respawnTime", respawnTime)
+        })
+    }
+
+    fun npc(name: String, sprite: String, x: Double, y: Double) {
+        npcs.add(SpawnData(x, y).apply {
+            this.name(name)
+            put("sprite", sprite)
         })
     }
 
@@ -38,5 +50,9 @@ class AreaBuilder {
             put("height", height)
             put("color", Color.BROWN)
         })
+    }
+
+    fun build(): Area {
+        return Area(name, map, spawners, objects, npcs)
     }
 }

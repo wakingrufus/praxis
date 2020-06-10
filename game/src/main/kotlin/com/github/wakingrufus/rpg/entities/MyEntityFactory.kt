@@ -43,7 +43,16 @@ class MyEntityFactory : EntityFactory {
                 .with(SpawnerComponent(data))
                 .build()
     }
-
+    @Spawns("npc")
+    fun newNpc(data: SpawnData): Entity {
+        return FXGL.entityBuilder()
+                .type(EntityType.NPC)
+                .at(data.x, data.y)
+                .bbox(HitBox(BoundingShape.box(64.0, 64.0)))
+                .with(FieldMovementComponent(1))
+                .with(FieldAnimationComponent(data.get("sprite")))
+                .build()
+    }
     @Spawns("enemy")
     fun newEnemy(data: SpawnData): Entity {
         return FXGL.entityBuilder()
