@@ -6,23 +6,28 @@ import com.almasb.fxgl.entity.SpawnData
 import com.almasb.fxgl.entity.component.Component
 import com.almasb.fxgl.entity.component.Required
 import com.almasb.fxgl.entity.component.RequiredComponents
-import com.almasb.fxgl.entity.components.TransformComponent
 import com.almasb.fxgl.entity.getComponent
 import com.github.wakingrufus.rpg.entities.EntityType
 
 @RequiredComponents(
-        Required(TransformComponent::class),
+        Required(FieldMovementComponent::class),
         Required(FieldAnimationComponent::class))
-class MonsterAggroComponent(val name: String, val enemies: List<SpawnData>) : Component() {
+class MonsterAggroComponent(val name: String, val aggroRange: Int, val enemies: List<SpawnData>) : Component() {
     @Override
     override fun onUpdate(tpf: Double) {
         val player = FXGL.Companion.getGameWorld().getEntitiesByType(EntityType.PLAYER).first()
-        if (distanceToPlayer(player) < 100) {
-            entity.getComponent<TransformComponent>().translateTowards(player.position, 1.0)
-            if (entity.position.x > player.position.x) {
-                entity.getComponent<FieldAnimationComponent>().faceLeft()
-            } else {
+        if (distanceToPlayer(player) < aggroRange) {
+            if (entity.boundingBoxComponent.centerWorld.x < player.boundingBoxComponent.centerWorld.x) {
                 entity.getComponent<FieldAnimationComponent>().faceRight()
+                entity.getComponent<FieldMovementComponent>().moveRight()
+            } else if (entity.boundingBoxComponent.centerWorld.x > player.boundingBoxComponent.centerWorld.x) {
+                entity.getComponent<FieldAnimationComponent>().faceLeft()
+                entity.getComponent<FieldMovementComponent>().moveLeft()
+            }
+            if (entity.boundingBoxComponent.centerWorld.y < player.boundingBoxComponent.centerWorld.y) {
+                entity.getComponent<FieldMovementComponent>().moveDown()
+            } else if (entity.boundingBoxComponent.centerWorld.y > player.boundingBoxComponent.centerWorld.y) {
+                entity.getComponent<FieldMovementComponent>().moveUp()
             }
             entity.getComponent<FieldAnimationComponent>().walk()
         } else {
@@ -31,6 +36,6 @@ class MonsterAggroComponent(val name: String, val enemies: List<SpawnData>) : Co
     }
 
     private fun distanceToPlayer(player: Entity): Double {
-        return player.getComponent<TransformComponent>().distance(getEntity().getComponent())
+        return entity.distanceBBox(player)
     }
 }

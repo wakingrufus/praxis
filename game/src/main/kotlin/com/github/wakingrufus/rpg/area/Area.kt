@@ -19,11 +19,14 @@ class AreaBuilder {
     val objects: MutableList<SpawnData> = mutableListOf()
 
     fun spawn(name: String, sprite: String, x: Double, y: Double,
+              aggroRange: Int, speed : Int,
               respawnTime: Double,
               party: BattlePartyBuilder.() -> Unit) {
         spawners.add(SpawnData(x, y).apply {
             this.name(name)
             put("sprite", sprite)
+            put("aggroRange", aggroRange)
+            put("speed", speed)
             battleParty(party)
             put("respawnTime",respawnTime)
         })

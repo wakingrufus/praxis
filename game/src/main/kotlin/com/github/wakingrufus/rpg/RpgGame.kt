@@ -15,6 +15,7 @@ import com.github.wakingrufus.rpg.battle.BattleEngine
 import com.github.wakingrufus.rpg.battle.BattleStateKeys
 import com.github.wakingrufus.rpg.entities.EntityType
 import com.github.wakingrufus.rpg.entities.MyEntityFactory
+import com.github.wakingrufus.rpg.field.FieldMovementComponent
 import javafx.scene.input.KeyCode
 import java.util.*
 import java.util.function.BiConsumer
@@ -23,7 +24,7 @@ import kotlin.collections.set
 class Game : GameApplication() {
     private val log = Logger.get(javaClass)
     private var player: Entity? = null
-    private var playerComponent: PlayerComponent? = null
+    private var playerComponent: FieldMovementComponent? = null
     private val entityFactory = MyEntityFactory()
     private lateinit var areaLoader: AreaLoader
     override fun initSettings(settings: GameSettings) {
