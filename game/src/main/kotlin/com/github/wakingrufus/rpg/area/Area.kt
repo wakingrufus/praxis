@@ -4,6 +4,8 @@ import com.almasb.fxgl.entity.SpawnData
 import com.github.wakingrufus.rpg.entities.BattlePartyBuilder
 import com.github.wakingrufus.rpg.entities.battleParty
 import com.github.wakingrufus.rpg.entities.name
+import com.github.wakingrufus.rpg.npc.Npc
+import com.github.wakingrufus.rpg.npc.NpcBuilder
 import javafx.scene.paint.Color
 
 data class Area(
@@ -11,7 +13,7 @@ data class Area(
         val map: String,
         val spawners: List<SpawnData>,
         val objects: List<SpawnData>,
-        val npcs: List<SpawnData>)
+        val npcs: List<Npc>)
 
 fun area(name: String, map: String, builder: AreaBuilder.() -> Unit): Area {
     return AreaBuilder(name, map).apply(builder).build()
@@ -21,7 +23,7 @@ fun area(name: String, map: String, builder: AreaBuilder.() -> Unit): Area {
 class AreaBuilder(val name: String, val map: String) {
     val spawners: MutableList<SpawnData> = mutableListOf()
     val objects: MutableList<SpawnData> = mutableListOf()
-    val npcs: MutableList<SpawnData> = mutableListOf()
+    val npcs: MutableList<Npc> = mutableListOf()
 
     fun spawn(name: String, sprite: String, x: Double, y: Double,
               aggroRange: Int, speed: Int,
@@ -37,11 +39,10 @@ class AreaBuilder(val name: String, val map: String) {
         })
     }
 
-    fun npc(name: String, sprite: String, x: Double, y: Double) {
-        npcs.add(SpawnData(x, y).apply {
-            this.name(name)
-            put("sprite", sprite)
-        })
+    fun npc(name: String, sprite: String, x: Double, y: Double, builder: NpcBuilder.() -> Unit): Npc {
+        return NpcBuilder(name, sprite, x, y).apply(builder).build().also {
+            npcs.add(it)
+        }
     }
 
     fun mapObject(x: Double, y: Double, width: Double, height: Double) {

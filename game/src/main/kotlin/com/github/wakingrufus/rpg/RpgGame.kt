@@ -15,6 +15,7 @@ import com.github.wakingrufus.rpg.battle.BattleEngine
 import com.github.wakingrufus.rpg.battle.BattleStateKeys
 import com.github.wakingrufus.rpg.entities.EntityType
 import com.github.wakingrufus.rpg.entities.MyEntityFactory
+import com.github.wakingrufus.rpg.field.FieldInventoryMenuComponent
 import com.github.wakingrufus.rpg.field.FieldMovementComponent
 import javafx.scene.input.KeyCode
 import java.util.*
@@ -55,10 +56,11 @@ class Game : GameApplication() {
             playerComponent = it.getComponent()
             getGameScene().viewport.bindToEntity(it, 1000.0, 500.0)
         }
+
     }
 
     override fun initUI() {
-
+        FXGL.entityBuilder().type(EntityType.DIALOG).with(FieldInventoryMenuComponent()).buildAndAttach()
     }
 
     override fun initInput() {
@@ -87,16 +89,11 @@ class Game : GameApplication() {
                 FXGL.getWorldProperties().increment("pixelsMoved", +5)
             }
         }, KeyCode.S)
-        input.addAction(object : UserAction("Choose 1") {
+        input.addAction(object : UserAction("Activate") {
             override fun onActionEnd() {
-                getEventBus().fireEvent(ActionChoiceEvent(ActionChoiceEvent.ANY, 1))
+                playerComponent?.activate()
             }
-        }, KeyCode.DIGIT1)
-        input.addAction(object : UserAction("Choose 2") {
-            override fun onActionEnd() {
-                getEventBus().fireEvent(ActionChoiceEvent(ActionChoiceEvent.ANY, 2))
-            }
-        }, KeyCode.DIGIT2)
+        }, KeyCode.E)
         //     input.addAction(MenuAction(getGameState(), { gameMenu() }, { exitMenu() }), KeyCode.Q)
     }
 

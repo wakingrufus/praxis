@@ -15,6 +15,7 @@ import com.github.wakingrufus.rpg.battle.ability.AbilitiesComponent
 import com.github.wakingrufus.rpg.battle.ability.PrayComponent
 import com.github.wakingrufus.rpg.battle.ability.WeaponComponent
 import com.github.wakingrufus.rpg.field.*
+import com.github.wakingrufus.rpg.inventory.InventoryComponent
 import javafx.scene.paint.Color
 import javafx.scene.shape.Rectangle
 
@@ -31,6 +32,7 @@ class MyEntityFactory : EntityFactory {
                 .view(Rectangle(64.0, 64.0, Color.BLUE))
                 // 2. make it collidable
                 .collidable()
+                .with(InventoryComponent())
                 .with(FieldMovementComponent(2))
                 .build()
     }
@@ -51,6 +53,7 @@ class MyEntityFactory : EntityFactory {
                 .bbox(HitBox(BoundingShape.box(64.0, 64.0)))
                 .with(FieldMovementComponent(1))
                 .with(FieldAnimationComponent(data.get("sprite")))
+                .with(ActivateComponent())
                 .build()
     }
     @Spawns("enemy")

@@ -15,7 +15,7 @@ class AreaLoader(val gameWorld: GameWorld) {
                 gameWorld.spawn("spawner", it)
             }
             area.npcs.forEach {
-                gameWorld.spawn("npc", it)
+                gameWorld.spawn("npc", it.spawnData())
             }
         }
     }
