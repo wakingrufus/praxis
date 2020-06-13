@@ -12,7 +12,7 @@ interface BattleAi {
 class Attacker : BattleAi {
 
     override fun decideNextAction(self: Entity, gameWorld: GameWorld): BattleAction {
-        val action = action("attack") {
+        val action = abilityChoice("attack") {
             targetEffect { it.takeDamage(1, DamageType.MELEE) }
             performerEffect { it.entity.getComponent<BattleAnimationComponent>().attack() }
         }

@@ -1,12 +1,15 @@
 package com.github.wakingrufus.rpg.battle
 
-import com.almasb.fxgl.dsl.*
+import com.almasb.fxgl.dsl.getGameScene
+import com.almasb.fxgl.dsl.getGameState
+import com.almasb.fxgl.dsl.getUIFactoryService
+import com.almasb.fxgl.dsl.runOnce
 import com.almasb.fxgl.entity.Entity
 import com.almasb.fxgl.entity.component.Component
 import com.almasb.fxgl.entity.getComponent
 import javafx.collections.FXCollections
 import javafx.util.Duration
-
+import java.lang.Integer.min
 
 class BattleComponent(val name: String, val maxHp: Int, var speed: Int, var currentHp: Int = maxHp) : Component() {
     private val actionQueue = FXCollections.observableArrayList<BattleAction>()
@@ -33,7 +36,7 @@ class BattleComponent(val name: String, val maxHp: Int, var speed: Int, var curr
     }
 
     fun heal(value: Int) {
-        currentHp += value
+        currentHp = min(maxHp, currentHp + value)
     }
 }
 

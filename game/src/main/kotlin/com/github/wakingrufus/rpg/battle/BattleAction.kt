@@ -1,15 +1,25 @@
 package com.github.wakingrufus.rpg.battle
 
+import com.almasb.fxgl.dsl.getGameWorld
+import com.almasb.fxgl.entity.getComponent
 import com.github.wakingrufus.rpg.battle.ability.Ability
 import com.github.wakingrufus.rpg.battle.ability.AbilityBuilder
+import com.github.wakingrufus.rpg.entities.EntityType
+import com.github.wakingrufus.rpg.inventory.InventoryComponent
 
 class BattleAction(val name: String, val performer: BattleComponent, val effect: () -> Unit)
-class BattleActionChoice(val name: String, val ability: Ability) {
+
+sealed class BattleActionChoice(open val name: String)
+
+class AbilityActionChoice(override val name: String, val ability: Ability) : BattleActionChoice(name) {
     fun toBattleAction(performer: BattleComponent,
                        target: BattleComponent,
                        allies: List<BattleComponent>,
                        enemies: List<BattleComponent>): BattleAction {
         return BattleAction(name, performer) {
+            ability.consumes?.let {
+                getGameWorld().getEntitiesByType(EntityType.PLAYER).first().getComponent<InventoryComponent>().remove(it)
+            }
             ability.performerEffect(performer)
             allies.forEach { ability.alliesEffect(it) }
             enemies.forEach { ability.enemiesEffect(it) }
@@ -21,6 +31,9 @@ class BattleActionChoice(val name: String, val ability: Ability) {
                        allies: List<BattleComponent>,
                        enemies: List<BattleComponent>): BattleAction {
         return BattleAction(name, performer) {
+            ability.consumes?.let {
+                getGameWorld().getEntitiesByType(EntityType.PLAYER).first().getComponent<InventoryComponent>().remove(it)
+            }
             ability.performerEffect(performer)
             allies.forEach { ability.alliesEffect(it) }
             enemies.forEach { ability.enemiesEffect(it) }
@@ -28,6 +41,12 @@ class BattleActionChoice(val name: String, val ability: Ability) {
     }
 }
 
-fun action(name: String, builder: AbilityBuilder.() -> Unit): BattleActionChoice {
-    return BattleActionChoice(name = name, ability = AbilityBuilder().apply(builder).invoke())
+class ChooseAbilityActionChoice(override val name: String, val choices: () -> List<BattleActionChoice>) : BattleActionChoice(name)
+
+fun chooseChoice(name: String, choices: () -> List<BattleActionChoice>): ChooseAbilityActionChoice {
+    return ChooseAbilityActionChoice(name, choices)
+}
+
+fun abilityChoice(name: String, builder: AbilityBuilder.() -> Unit): AbilityActionChoice {
+    return AbilityActionChoice(name = name, ability = AbilityBuilder().apply(builder).build())
 }

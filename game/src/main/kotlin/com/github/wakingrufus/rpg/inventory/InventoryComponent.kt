@@ -13,4 +13,15 @@ class InventoryComponent : Component() {
     fun byName(): List<Pair<InventoryItem, Int>> {
         return items.toList().sortedBy { it.first.name }
     }
+
+    fun remove(item: InventoryItem) {
+        items[item]?.let {
+            if (it == 1) {
+                items.remove(item)
+            } else {
+                items[item] = it - 1
+            }
+        }
+
+    }
 }

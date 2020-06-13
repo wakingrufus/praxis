@@ -9,6 +9,7 @@ import com.almasb.fxgl.entity.getComponent
 import com.almasb.fxgl.input.Input
 import com.almasb.fxgl.input.UserAction
 import com.almasb.fxgl.logging.Logger
+import com.github.wakingrufus.praxis.PRAXIS_AREAS
 import com.github.wakingrufus.rpg.area.AreaLoader
 import com.github.wakingrufus.rpg.battle.ActionChoiceEvent
 import com.github.wakingrufus.rpg.battle.BattleEngine
@@ -51,7 +52,7 @@ class Game : GameApplication() {
     override fun initGame() {
         getGameWorld().addEntityFactory(entityFactory)
         areaLoader = AreaLoader(getGameWorld())
-        areaLoader.loadArea("home")
+        areaLoader.loadArea(PRAXIS_AREAS.badlands)
         player = getGameWorld().spawn("player").also {
             playerComponent = it.getComponent()
             getGameScene().viewport.bindToEntity(it, 1000.0, 500.0)

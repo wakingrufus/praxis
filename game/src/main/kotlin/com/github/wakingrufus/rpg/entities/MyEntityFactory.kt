@@ -12,6 +12,7 @@ import com.github.wakingrufus.rpg.battle.BattleComponent
 import com.github.wakingrufus.rpg.battle.HealPowerComponent
 import com.github.wakingrufus.rpg.battle.PartyBattleComponent
 import com.github.wakingrufus.rpg.battle.ability.AbilitiesComponent
+import com.github.wakingrufus.rpg.battle.ability.ItemComponent
 import com.github.wakingrufus.rpg.battle.ability.PrayComponent
 import com.github.wakingrufus.rpg.battle.ability.WeaponComponent
 import com.github.wakingrufus.rpg.field.*
@@ -45,17 +46,7 @@ class MyEntityFactory : EntityFactory {
                 .with(SpawnerComponent(data))
                 .build()
     }
-    @Spawns("npc")
-    fun newNpc(data: SpawnData): Entity {
-        return FXGL.entityBuilder()
-                .type(EntityType.NPC)
-                .at(data.x, data.y)
-                .bbox(HitBox(BoundingShape.box(64.0, 64.0)))
-                .with(FieldMovementComponent(1))
-                .with(FieldAnimationComponent(data.get("sprite")))
-                .with(ActivateComponent())
-                .build()
-    }
+
     @Spawns("enemy")
     fun newEnemy(data: SpawnData): Entity {
         return FXGL.entityBuilder()
@@ -105,6 +96,7 @@ class MyEntityFactory : EntityFactory {
                 .with(WeaponComponent(data.get("weapon")))
                 .with(PrayComponent())
                 .with(PartyBattleComponent(data.get("partyOrder")))
+                .with(ItemComponent())
                 .build()
     }
 }

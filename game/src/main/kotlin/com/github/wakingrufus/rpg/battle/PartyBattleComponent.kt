@@ -29,10 +29,10 @@ class PartyBattleComponent(val playerOrder: Int) : Component() {
     lateinit var currentHp: Text
     lateinit var maxHp: Text
 
-    fun triggerAction(battleActionChoice: BattleActionChoice) {
+    fun triggerAction(battleActionChoice: AbilityActionChoice) {
         log.info("action chosen ${battleActionChoice.name}")
         if (battleActionChoice.ability.requiresTarget) {
-            val targetChooserNode = battleDialog {
+            node = battleDialog {
                 getGameWorld().getEntitiesByType(EntityType.ENEMY_PARTY).forEach {
                     choice(it.battleComponent().name) {
                         entity.battleComponent().queueAction(battleActionChoice.toBattleAction(
@@ -45,8 +45,7 @@ class PartyBattleComponent(val playerOrder: Int) : Component() {
                     }
                 }
             }
-            getGameScene().removeUINode(node)
-            getGameScene().addUINode(targetChooserNode)
+            getGameScene().addUINode(node)
         } else {
             entity.battleComponent().queueAction(battleActionChoice.toBattleAction(
                     performer = entity.battleComponent(),
@@ -54,46 +53,38 @@ class PartyBattleComponent(val playerOrder: Int) : Component() {
                     enemies = getGameWorld().getEntitiesByType(EntityType.ENEMY_PARTY).map { it.battleComponent() })
             )
             getGameState().setValue(BattleStateKeys.activePartyMember, false)
-            getGameScene().removeUINode(node)
+            //  getGameScene().removeUINode(node)
         }
 
     }
 
-    override fun onUpdate(tpf: Double) {
-        if (infoNode == null) {
-            nameNode = FXGL.getUIFactoryService().newText(this.entity.battleComponent().name)
-            currentHp = FXGL.getUIFactoryService().newText(this.entity.battleComponent().currentHp.toString())
-            maxHp = FXGL.getUIFactoryService().newText(this.entity.battleComponent().maxHp.toString())
-            infoNode = HBox().apply {
-                background = Background(BackgroundFill(Color.BLACK, null, null))
-                translateX = 960.0
-                translateY = 800.0 + (playerOrder * 50)
-                minWidth = 480.0
-                maxWidth = 480.0
-                minHeight = 40.0
-                maxHeight = 40.0
-                children.add(nameNode)
-                children.add(currentHp)
-                children.add(maxHp)
-            }.also {
-                getGameScene().addUINode(it)
-            }
-
+    override fun onAdded() {
+        nameNode = FXGL.getUIFactoryService().newText(this.entity.battleComponent().name)
+        currentHp = FXGL.getUIFactoryService().newText(this.entity.battleComponent().currentHp.toString())
+        maxHp = FXGL.getUIFactoryService().newText(this.entity.battleComponent().maxHp.toString())
+        infoNode = HBox().apply {
+            background = Background(BackgroundFill(Color.BLACK, null, null))
+            translateX = 960.0
+            translateY = 800.0 + (playerOrder * 50)
+            minWidth = 480.0
+            maxWidth = 480.0
+            minHeight = 40.0
+            maxHeight = 40.0
+            children.add(nameNode)
+            children.add(currentHp)
+            children.add(maxHp)
+        }.also {
+            getGameScene().addUINode(it)
         }
+    }
+
+    override fun onUpdate(tpf: Double) {
         currentHp.text = this.entity.battleComponent().currentHp.toString()
         if (entity.battleComponent().canTakeTurn()) {
             if (!getGameState().getBoolean(BattleStateKeys.activePartyMember)) {
                 val abilities = entity.getComponent<AbilitiesComponent>().getAbilities()
                 getGameState().setValue(BattleStateKeys.activePartyMember, true)
-                node = battleDialog {
-                    title(entity.battleComponent().name)
-                    abilities.forEach { ability ->
-                        choice(ability.name) {
-                            triggerAction(ability)
-                        }
-                    }
-                }
-                getGameScene().addUINode(node)
+                promptForChoice(abilities)
             }
         }
         if (getGameWorld().getEntitiesByType(EntityType.BATTLE).isEmpty()) {
@@ -102,6 +93,20 @@ class PartyBattleComponent(val playerOrder: Int) : Component() {
             }
 
         }
+    }
+
+    private fun promptForChoice(choices: List<BattleActionChoice>) {
+        getGameScene().addUINode(battleDialog {
+            title(entity.battleComponent().name)
+            choices.forEach { ability ->
+                choice(ability.name) {
+                    when (ability) {
+                        is AbilityActionChoice -> triggerAction(ability)
+                        is ChooseAbilityActionChoice -> promptForChoice(ability.choices())
+                    }
+                }
+            }
+        }.also { node = it })
     }
 
     override fun onRemoved() {

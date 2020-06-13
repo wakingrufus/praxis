@@ -8,6 +8,9 @@ class Npc(val name: String, val sprite: String, val x: Double, val y: Double, va
         return SpawnData(x, y).apply {
             name(name)
             put("sprite", sprite)
+            conversation?.also {
+                put("conversation",it)
+            }
         }
     }
 }

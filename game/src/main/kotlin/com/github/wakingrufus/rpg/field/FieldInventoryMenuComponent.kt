@@ -5,29 +5,22 @@ import com.almasb.fxgl.dsl.getGameWorld
 import com.almasb.fxgl.dsl.getUIFactoryService
 import com.almasb.fxgl.entity.component.Component
 import com.almasb.fxgl.entity.getComponent
-import com.github.wakingrufus.collections.bind
 import com.github.wakingrufus.rpg.entities.EntityType
 import com.github.wakingrufus.rpg.inventory.InventoryComponent
-import com.github.wakingrufus.rpg.inventory.InventoryItem
-import javafx.collections.FXCollections
-import javafx.collections.ObservableList
-import javafx.scene.layout.HBox
+import javafx.scene.layout.Pane
 
 class FieldInventoryMenuComponent : Component() {
-    val list: ObservableList<Pair<InventoryItem, Int>> = FXCollections.observableArrayList()
+    lateinit var pane: Pane
     override fun onAdded() {
         val window = getUIFactoryService().newWindow()
-        window.contentPane.children.add(HBox().apply {
-            children.bind(list) {
-                getUIFactoryService().newText("${it.first.name}: ${it.second}")
-            }
-        })
         window.title = "Inventory"
+        pane = window.contentPane
+        window.canClose = false
         getGameScene().addUINode(window)
     }
 
     override fun onUpdate(tpf: Double) {
-        list.clear()
-        list.addAll(getGameWorld().getEntitiesByType(EntityType.PLAYER).first().getComponent<InventoryComponent>().byName())
+        pane.children.setAll(getGameWorld().getEntitiesByType(EntityType.PLAYER).first().getComponent<InventoryComponent>().byName()
+                .map { getUIFactoryService().newText("${it.first.name}: ${it.second}") })
     }
 }
