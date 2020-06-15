@@ -29,7 +29,8 @@ class BattleEngine(val gameScene: GameScene, val enemy: Entity) : Component() {
         }, 1)
         gameScene.addGameView(battleView)
         enemy.getComponent<MonsterAggroComponent>().enemies
-                .also { log.info("fighting ${it.size} monsters") }
+                .also { log.info("fighting ${it.enemies.size} monsters") }
+                .let { it.spawnData() }
                 .mapIndexed { index, spawnData ->
                     FXGL.entityBuilder()
                             .type(EntityType.ENEMY_PARTY)

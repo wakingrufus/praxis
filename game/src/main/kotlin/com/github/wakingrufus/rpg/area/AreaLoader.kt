@@ -8,6 +8,7 @@ import com.github.wakingrufus.rpg.entities.EntityType
 import com.github.wakingrufus.rpg.field.ActivateComponent
 import com.github.wakingrufus.rpg.field.FieldAnimationComponent
 import com.github.wakingrufus.rpg.field.FieldMovementComponent
+import com.github.wakingrufus.rpg.field.SpawnerComponent
 
 class AreaLoader(val gameWorld: GameWorld) {
 
@@ -17,7 +18,11 @@ class AreaLoader(val gameWorld: GameWorld) {
             gameWorld.spawn("rectangle", it)
         }
         area.spawners.forEach {
-            gameWorld.spawn("spawner", it)
+            FXGL.entityBuilder()
+                    .type(EntityType.SPAWNER)
+                    .at(it.x, it.y)
+                    .with(SpawnerComponent(it))
+                    .buildAndAttach()
         }
         area.npcs.forEach {
             FXGL.entityBuilder()

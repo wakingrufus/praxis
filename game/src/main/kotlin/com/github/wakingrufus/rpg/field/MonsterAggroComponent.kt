@@ -2,17 +2,17 @@ package com.github.wakingrufus.rpg.field
 
 import com.almasb.fxgl.dsl.FXGL
 import com.almasb.fxgl.entity.Entity
-import com.almasb.fxgl.entity.SpawnData
 import com.almasb.fxgl.entity.component.Component
 import com.almasb.fxgl.entity.component.Required
 import com.almasb.fxgl.entity.component.RequiredComponents
 import com.almasb.fxgl.entity.getComponent
+import com.github.wakingrufus.rpg.enemies.BattleParty
 import com.github.wakingrufus.rpg.entities.EntityType
 
 @RequiredComponents(
         Required(FieldMovementComponent::class),
         Required(FieldAnimationComponent::class))
-class MonsterAggroComponent(val name: String, val aggroRange: Int, val enemies: List<SpawnData>) : Component() {
+class MonsterAggroComponent(val name: String, val aggroRange: Int, val enemies: BattleParty) : Component() {
     @Override
     override fun onUpdate(tpf: Double) {
         val player = FXGL.Companion.getGameWorld().getEntitiesByType(EntityType.PLAYER).first()

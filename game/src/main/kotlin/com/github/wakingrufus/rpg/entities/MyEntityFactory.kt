@@ -38,15 +38,6 @@ class MyEntityFactory : EntityFactory {
                 .build()
     }
 
-    @Spawns("spawner")
-    fun spawner(data: SpawnData): Entity {
-        return FXGL.entityBuilder()
-                .type(EntityType.SPAWNER)
-                .at(data.x, data.y)
-                .with(SpawnerComponent(data))
-                .build()
-    }
-
     @Spawns("enemy")
     fun newEnemy(data: SpawnData): Entity {
         return FXGL.entityBuilder()

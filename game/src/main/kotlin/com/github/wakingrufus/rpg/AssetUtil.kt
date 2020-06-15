@@ -30,4 +30,3 @@ fun getAnimation(name: String, type: AnimationType, duration: Duration): Animati
     }
     return AnimationChannel(list, duration)
 }
-
