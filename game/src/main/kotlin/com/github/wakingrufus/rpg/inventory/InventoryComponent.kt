@@ -1,6 +1,7 @@
 package com.github.wakingrufus.rpg.inventory
 
 import com.almasb.fxgl.entity.component.Component
+import com.github.wakingrufus.praxis.PraxisItemDb
 import javafx.collections.FXCollections
 import javafx.collections.ObservableMap
 
@@ -22,6 +23,5 @@ class InventoryComponent : Component() {
                 items[item] = it - 1
             }
         }
-
     }
 }

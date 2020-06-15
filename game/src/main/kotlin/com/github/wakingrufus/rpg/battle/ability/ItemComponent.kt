@@ -4,8 +4,8 @@ import com.almasb.fxgl.dsl.getGameWorld
 import com.almasb.fxgl.entity.component.Component
 import com.almasb.fxgl.entity.component.Required
 import com.almasb.fxgl.entity.getComponent
-import com.github.wakingrufus.rpg.battle.AbilityActionChoice
 import com.github.wakingrufus.rpg.battle.chooseChoice
+import com.github.wakingrufus.rpg.battle.consumableChoice
 import com.github.wakingrufus.rpg.entities.EntityType
 import com.github.wakingrufus.rpg.inventory.Consumable
 import com.github.wakingrufus.rpg.inventory.InventoryComponent
@@ -20,7 +20,7 @@ class ItemComponent : Component() {
                             .getComponent<InventoryComponent>().byName()
                             .mapNotNull {
                                 when (val item = it.first) {
-                                    is Consumable -> AbilityActionChoice(item.name + ": " + it.second, item.ability)
+                                    is Consumable -> consumableChoice(item.name + ": " + it.second, item, item.ability)
                                     else -> null
                                 }
                             }

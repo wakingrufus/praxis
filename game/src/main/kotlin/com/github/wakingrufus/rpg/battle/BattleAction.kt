@@ -5,6 +5,7 @@ import com.almasb.fxgl.entity.getComponent
 import com.github.wakingrufus.rpg.battle.ability.Ability
 import com.github.wakingrufus.rpg.battle.ability.AbilityBuilder
 import com.github.wakingrufus.rpg.entities.EntityType
+import com.github.wakingrufus.rpg.inventory.Consumable
 import com.github.wakingrufus.rpg.inventory.InventoryComponent
 
 class BattleAction(val name: String, val performer: BattleComponent, val effect: () -> Unit)
@@ -49,4 +50,8 @@ fun chooseChoice(name: String, choices: () -> List<BattleActionChoice>): ChooseA
 
 fun abilityChoice(name: String, builder: AbilityBuilder.() -> Unit): AbilityActionChoice {
     return AbilityActionChoice(name = name, ability = AbilityBuilder().apply(builder).build())
+}
+
+fun consumableChoice(name: String, consumable: Consumable, builder: AbilityBuilder): AbilityActionChoice {
+    return AbilityActionChoice(name = name, ability = builder.apply { consumes(consumable) }.build())
 }
