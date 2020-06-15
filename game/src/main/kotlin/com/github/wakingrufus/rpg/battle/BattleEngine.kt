@@ -8,7 +8,7 @@ import com.almasb.fxgl.entity.SpawnData
 import com.almasb.fxgl.entity.component.Component
 import com.almasb.fxgl.entity.getComponent
 import com.almasb.fxgl.logging.Logger
-import com.github.wakingrufus.rpg.*
+import com.github.wakingrufus.rpg.Weapon
 import com.github.wakingrufus.rpg.entities.EntityType
 import com.github.wakingrufus.rpg.field.MonsterAggroComponent
 import com.github.wakingrufus.rpg.field.MonsterDespawnEvent
@@ -28,21 +28,20 @@ class BattleEngine(val gameScene: GameScene, val enemy: Entity) : Component() {
             fitHeight = 800.0
         }, 1)
         gameScene.addGameView(battleView)
-        enemy.getComponent<MonsterAggroComponent>().enemies
-                .also { log.info("fighting ${it.enemies.size} monsters") }
-                .let { it.spawnData() }
+        enemy.getComponent<MonsterAggroComponent>().enemies.enemies
+                .also { log.info("fighting ${it.size} monsters") }
                 .mapIndexed { index, spawnData ->
                     FXGL.entityBuilder()
                             .type(EntityType.ENEMY_PARTY)
                             .at(1500.0, 500.0 + (index * 50))
                             .zIndex(2)
-                            .with(BattleComponent(spawnData.get("name"), spawnData.get("maxHp"), spawnData.get("speed")))
+                            .with(BattleComponent(spawnData.name, spawnData.maxHp, spawnData.speed))
                             .with(BattleAiComponent(Attacker()))
                             .with(EnemyBattleComponent())
-                            .with(BattleAnimationComponent(spawnData.get("sprite"), Orientation.LEFT))
+                            .with(BattleAnimationComponent(spawnData.sprite, Orientation.LEFT))
                             .buildAndAttach()
                 }
-       val partyEntity = gameScene.gameWorld.spawn("partyMember", SpawnData(100.0, 500.0).apply {
+        val partyEntity = gameScene.gameWorld.spawn("partyMember", SpawnData(100.0, 500.0).apply {
             put("width", 40.0)
             put("height", 40.0)
             put("name", "player")
@@ -57,7 +56,7 @@ class BattleEngine(val gameScene: GameScene, val enemy: Entity) : Component() {
 
     @Override
     override fun onUpdate(tpf: Double) {
-        if(getGameWorld().getEntitiesByType(EntityType.ENEMY_PARTY).isEmpty()){
+        if (getGameWorld().getEntitiesByType(EntityType.ENEMY_PARTY).isEmpty()) {
             getGameWorld().removeEntity(this.entity)
         }
         val allBattleEntities = getGameWorld().getEntitiesByType(EntityType.PARTY)
