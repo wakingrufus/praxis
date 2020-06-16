@@ -9,15 +9,18 @@ import com.almasb.fxgl.entity.component.Component
 import com.almasb.fxgl.entity.getComponent
 import com.almasb.fxgl.logging.Logger
 import com.github.wakingrufus.rpg.Weapon
+import com.github.wakingrufus.rpg.enemies.BattleParty
 import com.github.wakingrufus.rpg.entities.EntityType
 import com.github.wakingrufus.rpg.field.MonsterAggroComponent
 import com.github.wakingrufus.rpg.field.MonsterDespawnEvent
+import com.github.wakingrufus.rpg.inventory.addItemToInventory
 import javafx.scene.image.ImageView
 
 class BattleEngine(val gameScene: GameScene, val enemy: Entity) : Component() {
     private val log = Logger.get(javaClass)
     private lateinit var worldEnemy: Entity
     private lateinit var battleView: GameView
+    private lateinit var battleParty: BattleParty
 
     override fun onAdded() {
         gameScene.gameWorld.properties.setValue("battle", true)
@@ -28,7 +31,8 @@ class BattleEngine(val gameScene: GameScene, val enemy: Entity) : Component() {
             fitHeight = 800.0
         }, 1)
         gameScene.addGameView(battleView)
-        enemy.getComponent<MonsterAggroComponent>().enemies.enemies
+        battleParty = enemy.getComponent<MonsterAggroComponent>().enemies
+        battleParty.enemies
                 .also { log.info("fighting ${it.size} monsters") }
                 .mapIndexed { index, spawnData ->
                     FXGL.entityBuilder()
@@ -77,6 +81,9 @@ class BattleEngine(val gameScene: GameScene, val enemy: Entity) : Component() {
 
     override fun onRemoved() {
         log.info("Victory!")
+        val loot = battleParty.lootTable.rollLoot()
+        FXGL.getDialogService().showMessageBox("Victory!\nYou Obtained:\n" + loot.joinToString("\n") { it.name })
+        loot.forEach { addItemToInventory(it, 1) }
         getEventBus().fireEvent(MonsterDespawnEvent(MonsterDespawnEvent.ANY, worldEnemy))
         getGameWorld().getEntitiesByType(EntityType.PARTY)
                 .forEach { getGameWorld().removeEntities(it) }

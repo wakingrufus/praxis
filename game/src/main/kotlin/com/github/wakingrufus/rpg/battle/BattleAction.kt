@@ -1,12 +1,9 @@
 package com.github.wakingrufus.rpg.battle
 
-import com.almasb.fxgl.dsl.getGameWorld
-import com.almasb.fxgl.entity.getComponent
 import com.github.wakingrufus.rpg.battle.ability.Ability
 import com.github.wakingrufus.rpg.battle.ability.AbilityBuilder
-import com.github.wakingrufus.rpg.entities.EntityType
 import com.github.wakingrufus.rpg.inventory.Consumable
-import com.github.wakingrufus.rpg.inventory.InventoryComponent
+import com.github.wakingrufus.rpg.inventory.removeItemFromInventory
 
 class BattleAction(val name: String, val performer: BattleComponent, val effect: () -> Unit)
 
@@ -19,7 +16,7 @@ class AbilityActionChoice(override val name: String, val ability: Ability) : Bat
                        enemies: List<BattleComponent>): BattleAction {
         return BattleAction(name, performer) {
             ability.consumes?.let {
-                getGameWorld().getEntitiesByType(EntityType.PLAYER).first().getComponent<InventoryComponent>().remove(it)
+                removeItemFromInventory(it)
             }
             ability.performerEffect(performer)
             allies.forEach { ability.alliesEffect(it) }
@@ -33,7 +30,7 @@ class AbilityActionChoice(override val name: String, val ability: Ability) : Bat
                        enemies: List<BattleComponent>): BattleAction {
         return BattleAction(name, performer) {
             ability.consumes?.let {
-                getGameWorld().getEntitiesByType(EntityType.PLAYER).first().getComponent<InventoryComponent>().remove(it)
+                removeItemFromInventory(it)
             }
             ability.performerEffect(performer)
             allies.forEach { ability.alliesEffect(it) }
