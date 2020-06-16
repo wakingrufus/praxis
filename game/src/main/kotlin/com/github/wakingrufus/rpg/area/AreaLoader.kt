@@ -6,7 +6,7 @@ import com.almasb.fxgl.physics.BoundingShape
 import com.almasb.fxgl.physics.HitBox
 import com.github.wakingrufus.rpg.entities.EntityType
 import com.github.wakingrufus.rpg.field.ActivateComponent
-import com.github.wakingrufus.rpg.field.FieldAnimationComponent
+import com.github.wakingrufus.rpg.field.FieldLpcAnimationComponent
 import com.github.wakingrufus.rpg.field.FieldMovementComponent
 import com.github.wakingrufus.rpg.field.SpawnerComponent
 
@@ -28,12 +28,11 @@ class AreaLoader(val gameWorld: GameWorld) {
             FXGL.entityBuilder()
                     .type(EntityType.NPC)
                     .at(it.x, it.y)
-                    .bbox(HitBox(BoundingShape.box(64.0, 64.0)))
+                    .bbox(HitBox(BoundingShape.box(32.0, 56.0)))
                     .with(FieldMovementComponent(1))
-                    .with(FieldAnimationComponent(it.sprite))
+                    .with(FieldLpcAnimationComponent(it.sprite))
                     .with(ActivateComponent(conversation = it.conversation))
                     .buildAndAttach()
-            //   gameWorld.spawn("npc", it.spawnData())
         }
     }
 }

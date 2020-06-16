@@ -1,5 +1,6 @@
 package com.github.wakingrufus.rpg.battle
 
+import com.almasb.fxgl.entity.getComponent
 import com.github.wakingrufus.rpg.battle.ability.Ability
 import com.github.wakingrufus.rpg.battle.ability.AbilityBuilder
 import com.github.wakingrufus.rpg.inventory.Consumable
@@ -22,6 +23,7 @@ class AbilityActionChoice(override val name: String, val ability: Ability) : Bat
             allies.forEach { ability.alliesEffect(it) }
             enemies.forEach { ability.enemiesEffect(it) }
             ability.targetEffect(target)
+            ability.animation(performer.entity.getComponent())
         }
     }
 
@@ -35,6 +37,7 @@ class AbilityActionChoice(override val name: String, val ability: Ability) : Bat
             ability.performerEffect(performer)
             allies.forEach { ability.alliesEffect(it) }
             enemies.forEach { ability.enemiesEffect(it) }
+            ability.animation(performer.entity.getComponent())
         }
     }
 }

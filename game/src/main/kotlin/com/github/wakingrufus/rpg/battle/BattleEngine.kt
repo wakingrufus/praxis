@@ -4,11 +4,14 @@ import com.almasb.fxgl.app.scene.GameScene
 import com.almasb.fxgl.app.scene.GameView
 import com.almasb.fxgl.dsl.*
 import com.almasb.fxgl.entity.Entity
-import com.almasb.fxgl.entity.SpawnData
 import com.almasb.fxgl.entity.component.Component
 import com.almasb.fxgl.entity.getComponent
 import com.almasb.fxgl.logging.Logger
 import com.github.wakingrufus.rpg.Weapon
+import com.github.wakingrufus.rpg.battle.ability.AbilitiesComponent
+import com.github.wakingrufus.rpg.battle.ability.ItemComponent
+import com.github.wakingrufus.rpg.battle.ability.PrayComponent
+import com.github.wakingrufus.rpg.battle.ability.WeaponComponent
 import com.github.wakingrufus.rpg.enemies.BattleParty
 import com.github.wakingrufus.rpg.entities.EntityType
 import com.github.wakingrufus.rpg.field.MonsterAggroComponent
@@ -45,15 +48,19 @@ class BattleEngine(val gameScene: GameScene, val enemy: Entity) : Component() {
                             .with(BattleAnimationComponent(spawnData.sprite, Orientation.LEFT))
                             .buildAndAttach()
                 }
-        val partyEntity = gameScene.gameWorld.spawn("partyMember", SpawnData(100.0, 500.0).apply {
-            put("width", 40.0)
-            put("height", 40.0)
-            put("name", "player")
-            put("maxHp", 100)
-            put("speed", 15)
-            put("weapon", Weapon("Dagger", 10, DamageType.MELEE))
-            put("partyOrder", 0)
-        })
+        val partyEntity = FXGL.entityBuilder()
+                .type(EntityType.PARTY)
+                .at(100.0, 500.0)
+                .zIndex(2)
+                .with(BattleAnimationComponent("main", Orientation.RIGHT))
+                .with(BattleComponent("Player", 100, 15))
+                .with(HealPowerComponent(1))
+                .with(AbilitiesComponent())
+                .with(WeaponComponent(Weapon("Dagger", 10, DamageType.MELEE)))
+                .with(PrayComponent())
+                .with(PartyBattleComponent(0))
+                .with(ItemComponent())
+                .buildAndAttach()
         gameScene.viewport.bindToEntity(partyEntity, partyEntity.x, partyEntity.y)
         getGameState().intProperty(BattleStateKeys.turn).set(1)
     }

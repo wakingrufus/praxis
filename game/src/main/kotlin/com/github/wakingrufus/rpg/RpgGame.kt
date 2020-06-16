@@ -11,13 +11,11 @@ import com.almasb.fxgl.input.UserAction
 import com.almasb.fxgl.logging.Logger
 import com.github.wakingrufus.praxis.PRAXIS_AREAS
 import com.github.wakingrufus.rpg.area.AreaLoader
-import com.github.wakingrufus.rpg.battle.ActionChoiceEvent
 import com.github.wakingrufus.rpg.battle.BattleEngine
 import com.github.wakingrufus.rpg.battle.BattleStateKeys
 import com.github.wakingrufus.rpg.entities.EntityType
 import com.github.wakingrufus.rpg.entities.MyEntityFactory
-import com.github.wakingrufus.rpg.field.FieldInventoryMenuComponent
-import com.github.wakingrufus.rpg.field.FieldMovementComponent
+import com.github.wakingrufus.rpg.field.*
 import javafx.scene.input.KeyCode
 import java.util.*
 import java.util.function.BiConsumer
@@ -66,30 +64,10 @@ class Game : GameApplication() {
 
     override fun initInput() {
         val input: Input = FXGL.getInput()
-        input.addAction(object : UserAction("Move Right") {
-            override fun onAction() {
-                playerComponent?.moveRight()
-                FXGL.getWorldProperties().increment("pixelsMoved", +5)
-            }
-        }, KeyCode.D)
-        input.addAction(object : UserAction("Move Left") {
-            override fun onAction() {
-                playerComponent?.moveLeft()
-                FXGL.getWorldProperties().increment("pixelsMoved", +5)
-            }
-        }, KeyCode.A)
-        input.addAction(object : UserAction("Move Up") {
-            override fun onAction() {
-                playerComponent?.moveUp()
-                FXGL.getWorldProperties().increment("pixelsMoved", +5)
-            }
-        }, KeyCode.W)
-        input.addAction(object : UserAction("Move Down") {
-            override fun onAction() {
-                playerComponent?.moveDown()
-                FXGL.getWorldProperties().increment("pixelsMoved", +5)
-            }
-        }, KeyCode.S)
+        onKey(KeyCode.D, ::movePlayerEast)
+        onKey(KeyCode.A, ::movePlayerWest)
+        onKey(KeyCode.W, ::movePlayerNorth)
+        onKey(KeyCode.S, ::movePlayerSouth)
         input.addAction(object : UserAction("Activate") {
             override fun onActionEnd() {
                 playerComponent?.activate()

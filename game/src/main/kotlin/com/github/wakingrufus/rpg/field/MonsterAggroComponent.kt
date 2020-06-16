@@ -11,25 +11,26 @@ import com.github.wakingrufus.rpg.entities.EntityType
 
 @RequiredComponents(
         Required(FieldMovementComponent::class),
-        Required(FieldAnimationComponent::class))
+        Required(FieldLpcAnimationComponent::class))
 class MonsterAggroComponent(val name: String, val aggroRange: Int, val enemies: BattleParty) : Component() {
     @Override
     override fun onUpdate(tpf: Double) {
         val player = FXGL.Companion.getGameWorld().getEntitiesByType(EntityType.PLAYER).first()
         if (distanceToPlayer(player) < aggroRange) {
             if (entity.boundingBoxComponent.centerWorld.x < player.boundingBoxComponent.centerWorld.x) {
-                entity.getComponent<FieldAnimationComponent>().faceRight()
+                entity.getComponent<FieldLpcAnimationComponent>().walkEast()
                 entity.getComponent<FieldMovementComponent>().moveRight()
             } else if (entity.boundingBoxComponent.centerWorld.x > player.boundingBoxComponent.centerWorld.x) {
-                entity.getComponent<FieldAnimationComponent>().faceLeft()
+                entity.getComponent<FieldLpcAnimationComponent>().walkWest()
                 entity.getComponent<FieldMovementComponent>().moveLeft()
             }
             if (entity.boundingBoxComponent.centerWorld.y < player.boundingBoxComponent.centerWorld.y) {
+                entity.getComponent<FieldLpcAnimationComponent>().walkSouth()
                 entity.getComponent<FieldMovementComponent>().moveDown()
             } else if (entity.boundingBoxComponent.centerWorld.y > player.boundingBoxComponent.centerWorld.y) {
+                entity.getComponent<FieldLpcAnimationComponent>().walkNorth()
                 entity.getComponent<FieldMovementComponent>().moveUp()
             }
-            entity.getComponent<FieldAnimationComponent>().walk()
         } else {
             // stop signalling
         }

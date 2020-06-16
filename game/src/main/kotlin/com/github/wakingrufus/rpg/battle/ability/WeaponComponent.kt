@@ -12,6 +12,7 @@ class WeaponComponent(val weapon: Weapon) : Component() {
         entity.getComponent<AbilitiesComponent>().addAbility(
                 abilityChoice("Attack") {
                     targetEffect { target -> target.takeDamage(weapon.damage, weapon.damageType) }
+                    animation { attack() }
                 })
     }
 }

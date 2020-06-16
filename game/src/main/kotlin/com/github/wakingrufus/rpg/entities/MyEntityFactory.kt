@@ -27,26 +27,12 @@ class MyEntityFactory : EntityFactory {
     fun newPlayer(data: SpawnData): Entity {
         return FXGL.entityBuilder(data)
                 .type(EntityType.PLAYER)
-                .at(64.0, 64.0)
-                // 1. define hit boxes manually
-                .bbox(HitBox(BoundingShape.box(64.0, 64.0)))
-                .view(Rectangle(64.0, 64.0, Color.BLUE))
-                // 2. make it collidable
+                .at(96.0, 56.0)
+                .bbox(HitBox(BoundingShape.box(32.0, 56.0)))
                 .collidable()
+                .with(FieldLpcAnimationComponent("main"))
                 .with(InventoryComponent())
                 .with(FieldMovementComponent(2))
-                .build()
-    }
-
-    @Spawns("enemy")
-    fun newEnemy(data: SpawnData): Entity {
-        return FXGL.entityBuilder()
-                .type(EntityType.ENEMY)
-                .at(data.x, data.y)
-                .bbox(HitBox(BoundingShape.box(64.0, 64.0)))
-                .collidable()
-                .with(MonsterAggroComponent(data.get("name"), data.get("aggroRange"), data.get("party")))
-                .with(FieldAnimationComponent(data.get("sprite")))
                 .build()
     }
 
@@ -71,23 +57,6 @@ class MyEntityFactory : EntityFactory {
                 // 1. define hit boxes manually
                 .viewWithBBox(Rectangle(data.get("width"), data.get("height"), data.get("color")))
                 // 2. make it collidable
-                .build()
-    }
-
-    @Spawns("partyMember")
-    fun partyMember(data: SpawnData): Entity {
-        return FXGL.entityBuilder()
-                .type(EntityType.PARTY)
-                .at(data.x, data.y)
-                .zIndex(2)
-                .view(Rectangle(40.0, 40.0, Color.BLUE))
-                .with(BattleComponent(data.get("name"), data.get("maxHp"), data.get("speed")))
-                .with(HealPowerComponent(1))
-                .with(AbilitiesComponent())
-                .with(WeaponComponent(data.get("weapon")))
-                .with(PrayComponent())
-                .with(PartyBattleComponent(data.get("partyOrder")))
-                .with(ItemComponent())
                 .build()
     }
 }
