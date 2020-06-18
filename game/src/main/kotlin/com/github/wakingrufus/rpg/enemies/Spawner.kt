@@ -7,4 +7,4 @@ class Spawner(val name: String,
               val aggroRange: Int,
               val speed: Int,
               val respawnTime: Double,
-              val party: BattleParty)
+              val party: EnemyParty)

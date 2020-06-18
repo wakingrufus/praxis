@@ -6,13 +6,13 @@ import com.almasb.fxgl.entity.component.Component
 import com.almasb.fxgl.entity.component.Required
 import com.almasb.fxgl.entity.component.RequiredComponents
 import com.almasb.fxgl.entity.getComponent
-import com.github.wakingrufus.rpg.enemies.BattleParty
+import com.github.wakingrufus.rpg.enemies.EnemyParty
 import com.github.wakingrufus.rpg.entities.EntityType
 
 @RequiredComponents(
         Required(FieldMovementComponent::class),
         Required(FieldLpcAnimationComponent::class))
-class MonsterAggroComponent(val name: String, val aggroRange: Int, val enemies: BattleParty) : Component() {
+class MonsterAggroComponent(val name: String, val aggroRange: Int, val enemies: EnemyParty) : Component() {
     @Override
     override fun onUpdate(tpf: Double) {
         val player = FXGL.Companion.getGameWorld().getEntitiesByType(EntityType.PLAYER).first()

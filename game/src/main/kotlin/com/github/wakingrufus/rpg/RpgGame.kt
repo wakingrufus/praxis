@@ -43,6 +43,7 @@ class Game : GameApplication() {
 
     override fun initGameVars(vars: MutableMap<String?, Any?>) {
         vars["pixelsMoved"] = 0
+        vars["debug"] = false
         vars[BattleStateKeys.activePartyMember] = false
         vars[BattleStateKeys.turn] = 0
     }

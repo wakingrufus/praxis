@@ -7,12 +7,10 @@ import com.almasb.fxgl.entity.Entity
 import com.almasb.fxgl.entity.component.Component
 import com.almasb.fxgl.entity.getComponent
 import com.almasb.fxgl.logging.Logger
-import com.github.wakingrufus.rpg.Weapon
-import com.github.wakingrufus.rpg.battle.ability.AbilitiesComponent
-import com.github.wakingrufus.rpg.battle.ability.ItemComponent
-import com.github.wakingrufus.rpg.battle.ability.PrayComponent
-import com.github.wakingrufus.rpg.battle.ability.WeaponComponent
-import com.github.wakingrufus.rpg.enemies.BattleParty
+import com.github.wakingrufus.praxis.PraxisItemDb
+import com.github.wakingrufus.praxis.PraxisRecipesDb.ShortSword
+import com.github.wakingrufus.rpg.battle.ability.*
+import com.github.wakingrufus.rpg.enemies.EnemyParty
 import com.github.wakingrufus.rpg.entities.EntityType
 import com.github.wakingrufus.rpg.field.MonsterAggroComponent
 import com.github.wakingrufus.rpg.field.MonsterDespawnEvent
@@ -23,7 +21,7 @@ class BattleEngine(val gameScene: GameScene, val enemy: Entity) : Component() {
     private val log = Logger.get(javaClass)
     private lateinit var worldEnemy: Entity
     private lateinit var battleView: GameView
-    private lateinit var battleParty: BattleParty
+    private lateinit var battleParty: EnemyParty
 
     override fun onAdded() {
         gameScene.gameWorld.properties.setValue("battle", true)
@@ -37,15 +35,15 @@ class BattleEngine(val gameScene: GameScene, val enemy: Entity) : Component() {
         battleParty = enemy.getComponent<MonsterAggroComponent>().enemies
         battleParty.enemies
                 .also { log.info("fighting ${it.size} monsters") }
-                .mapIndexed { index, spawnData ->
+                .mapIndexed { index, enemy ->
                     FXGL.entityBuilder()
                             .type(EntityType.ENEMY_PARTY)
                             .at(1500.0, 500.0 + (index * 50))
                             .zIndex(2)
-                            .with(BattleComponent(spawnData.name, spawnData.maxHp, spawnData.speed))
-                            .with(BattleAiComponent(Attacker()))
+                            .with(BattleComponent(enemy.name, enemy.maxHp, enemy.speed))
+                            .with(BattleAiComponent(enemy.ai))
                             .with(EnemyBattleComponent())
-                            .with(BattleAnimationComponent(spawnData.sprite, Orientation.LEFT))
+                            .with(BattleAnimationComponent(enemy.sprite, Orientation.LEFT))
                             .buildAndAttach()
                 }
         val partyEntity = FXGL.entityBuilder()
@@ -54,9 +52,10 @@ class BattleEngine(val gameScene: GameScene, val enemy: Entity) : Component() {
                 .zIndex(2)
                 .with(BattleAnimationComponent("main", Orientation.RIGHT))
                 .with(BattleComponent("Player", 100, 15))
+                .with(EquipmentComponent(
+                        weapon = ShortSword.craft(listOf(PraxisItemDb.Iron, PraxisItemDb.Iron, PraxisItemDb.Iron, PraxisItemDb.Oak, PraxisItemDb.Topaz))))
                 .with(HealPowerComponent(1))
                 .with(AbilitiesComponent())
-                .with(WeaponComponent(Weapon("Dagger", 10, DamageType.MELEE)))
                 .with(PrayComponent())
                 .with(PartyBattleComponent(0))
                 .with(ItemComponent())
@@ -101,6 +100,6 @@ class BattleEngine(val gameScene: GameScene, val enemy: Entity) : Component() {
 }
 
 object BattleStateKeys {
-    val turn = "battle.turn"
-    val activePartyMember = "battle.activePartyMember"
+    const val turn = "battle.turn"
+    const val activePartyMember = "battle.activePartyMember"
 }

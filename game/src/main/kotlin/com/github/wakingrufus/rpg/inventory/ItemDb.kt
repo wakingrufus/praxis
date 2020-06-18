@@ -9,4 +9,8 @@ open class ItemDb {
     fun consumable(name: String, ability: AbilityBuilder.() -> Unit): Consumable {
         return Consumable(name, AbilityBuilder().apply(ability))
     }
+
+    fun material(name: String, type: MaterialType, builder: EquipmentFactory.() -> Unit): CraftingMaterial {
+        return CraftingMaterial(name, type, builder)
+    }
 }
