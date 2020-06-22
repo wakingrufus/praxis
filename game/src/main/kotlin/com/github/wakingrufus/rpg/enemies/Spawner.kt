@@ -1,7 +1,9 @@
 package com.github.wakingrufus.rpg.enemies
 
+import com.github.wakingrufus.rpg.sprites.LPCSpriteSheet
+
 class Spawner(val name: String,
-              val sprite: String,
+              val sprite: LPCSpriteSheet,
               val x: Double,
               val y: Double,
               val aggroRange: Int,

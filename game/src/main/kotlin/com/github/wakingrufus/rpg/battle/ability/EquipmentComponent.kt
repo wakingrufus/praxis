@@ -5,6 +5,7 @@ import com.almasb.fxgl.logging.Logger
 import com.github.wakingrufus.rpg.battle.DamageType
 import com.github.wakingrufus.rpg.inventory.Armor
 import com.github.wakingrufus.rpg.inventory.Weapon
+import com.github.wakingrufus.rpg.sprites.AttackAnimationType
 
 class EquipmentComponent(val helm: Armor? = null, val weapon: Weapon?) : Component() {
     val allEquipment = listOfNotNull(helm, weapon)
@@ -16,5 +17,8 @@ class EquipmentComponent(val helm: Armor? = null, val weapon: Weapon?) : Compone
     }
     fun attackDamageType(): DamageType{
         return weapon?.primaryDamageType ?: DamageType.MELEE
+    }
+    fun attackAnimationType(): AttackAnimationType{
+        return weapon?.attackAnimationType ?: AttackAnimationType.SLASH
     }
 }

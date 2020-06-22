@@ -24,7 +24,7 @@ class MyEntityFactory : EntityFactory {
                 .at(96.0, 56.0)
                 .bbox(HitBox(BoundingShape.box(32.0, 56.0)))
                 .collidable()
-                .with(FieldLpcAnimationComponent("main"))
+                .with(FieldLpcAnimationComponent(getGameState().getObject("mainSpriteSheet")))
                 .with(InventoryComponent())
                 .with(FieldMovementComponent(2))
                 .build()

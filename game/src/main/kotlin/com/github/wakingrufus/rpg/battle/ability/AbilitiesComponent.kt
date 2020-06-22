@@ -21,15 +21,15 @@ class AbilitiesComponent : Component() {
     }
 
     override fun onAdded() {
+        val equipComponent: EquipmentComponent = entity.getComponent()
         addAbility(
-                abilityChoice("Attack") {
+                abilityChoice("Attack", equipComponent.attackAnimationType()) {
                     targetEffect { target ->
-                        val attackType = entity.getComponent<EquipmentComponent>().attackDamageType()
-                        val attackPower = entity.getComponent<EquipmentComponent>().attackModifier(attackType)
+                        val attackType = equipComponent.attackDamageType()
+                        val attackPower = equipComponent.attackModifier(attackType)
                         log.info("${entity.battleComponent().name} attacks for $attackPower $attackType damage")
                         target.takeDamage(attackPower, attackType)
                     }
-                    animation { attack() }
                 })
     }
 }

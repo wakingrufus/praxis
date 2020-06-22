@@ -15,6 +15,8 @@ import com.github.wakingrufus.rpg.entities.EntityType
 import com.github.wakingrufus.rpg.field.MonsterAggroComponent
 import com.github.wakingrufus.rpg.field.MonsterDespawnEvent
 import com.github.wakingrufus.rpg.inventory.addItemToInventory
+import com.github.wakingrufus.rpg.sprites.SpriteOrientation
+import com.github.wakingrufus.rpg.sprites.characterSpriteSheet
 import javafx.scene.image.ImageView
 
 class BattleEngine(val gameScene: GameScene, val enemy: Entity) : Component() {
@@ -43,14 +45,14 @@ class BattleEngine(val gameScene: GameScene, val enemy: Entity) : Component() {
                             .with(BattleComponent(enemy.name, enemy.maxHp, enemy.speed))
                             .with(BattleAiComponent(enemy.ai))
                             .with(EnemyBattleComponent())
-                            .with(BattleAnimationComponent(enemy.sprite, Orientation.LEFT))
+                            .with(BattleAnimationComponent(enemy.sprite, SpriteOrientation.WEST))
                             .buildAndAttach()
                 }
         val partyEntity = FXGL.entityBuilder()
                 .type(EntityType.PARTY)
                 .at(100.0, 500.0)
                 .zIndex(2)
-                .with(BattleAnimationComponent("main", Orientation.RIGHT))
+                .with(BattleAnimationComponent(getGameState().getObject("mainSpriteSheet"), SpriteOrientation.EAST))
                 .with(BattleComponent("Player", 100, 15))
                 .with(EquipmentComponent(
                         weapon = ShortSword.craft(listOf(PraxisItemDb.Iron, PraxisItemDb.Iron, PraxisItemDb.Iron, PraxisItemDb.Oak, PraxisItemDb.Topaz))))

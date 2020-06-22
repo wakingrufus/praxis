@@ -6,6 +6,7 @@ import com.almasb.fxgl.entity.component.RequiredComponents
 import com.almasb.fxgl.entity.getComponent
 import com.github.wakingrufus.rpg.battle.HealPowerComponent
 import com.github.wakingrufus.rpg.battle.abilityChoice
+import com.github.wakingrufus.rpg.sprites.AttackAnimationType
 
 @RequiredComponents(
         Required(AbilitiesComponent::class),
@@ -13,7 +14,7 @@ import com.github.wakingrufus.rpg.battle.abilityChoice
 class PrayComponent : Component() {
     override fun onAdded() {
         entity.getComponent<AbilitiesComponent>().addAbility(
-                abilityChoice("Pray") {
+                abilityChoice("Pray", AttackAnimationType.SPELL) {
                     alliesEffect { target -> target.heal(entity.getComponent<HealPowerComponent>().effectiveHealPower()) }
                 }
         )

@@ -2,8 +2,9 @@ package com.github.wakingrufus.rpg.npc
 
 import com.almasb.fxgl.entity.SpawnData
 import com.github.wakingrufus.rpg.entities.name
+import com.github.wakingrufus.rpg.sprites.LPCSpriteSheet
 
-class Npc(val name: String, val sprite: String, val x: Double, val y: Double, val conversation: Conversation?) {
+class Npc(val name: String, val sprite: LPCSpriteSheet, val x: Double, val y: Double, val conversation: Conversation?) {
     fun spawnData(): SpawnData {
         return SpawnData(x, y).apply {
             name(name)
@@ -15,7 +16,7 @@ class Npc(val name: String, val sprite: String, val x: Double, val y: Double, va
     }
 }
 
-class NpcBuilder(val name: String, val sprite: String, val x: Double, val y: Double) {
+class NpcBuilder(val name: String, val sprite: LPCSpriteSheet, val x: Double, val y: Double) {
     private var conversation: Conversation? = null
     fun conversation(builder: ConversationBuilder.() -> Unit) {
         conversation = ConversationBuilder().apply(builder).build()

@@ -2,36 +2,23 @@ package com.github.wakingrufus.rpg.battle
 
 import com.almasb.fxgl.entity.component.Component
 import com.almasb.fxgl.texture.AnimatedTexture
-import com.github.wakingrufus.rpg.LPCSpriteSheet
+import com.github.wakingrufus.rpg.sprites.AttackAnimationType
+import com.github.wakingrufus.rpg.sprites.LPCSpriteSheet
+import com.github.wakingrufus.rpg.sprites.SpriteOrientation
 
-enum class Orientation {
-    LEFT, RIGHT
-}
+class BattleAnimationComponent(val spriteSheet: LPCSpriteSheet, var orientation: SpriteOrientation) : Component() {
 
-class BattleAnimationComponent(name: String, var orientation: Orientation) : Component() {
-    val spriteSheet = LPCSpriteSheet(name)
     private val texture: AnimatedTexture = AnimatedTexture(spriteSheet.idleNorth)
 
     override fun onAdded() {
-        if (orientation == Orientation.LEFT) {
-            texture.playAnimationChannel(spriteSheet.idleNorth)
-        } else {
-            texture.playAnimationChannel(spriteSheet.idleNorth)
-        }
+        texture.playAnimationChannel(spriteSheet.getIdleAnimation(orientation))
         entity.viewComponent.addChild(texture)
     }
 
-    fun attack() {
-        if (orientation == Orientation.LEFT) {
-            texture.playAnimationChannel(spriteSheet.attackLeft)
-            texture.onCycleFinished = Runnable {
-                texture.loopAnimationChannel(spriteSheet.idleWest)
-            }
-        } else {
-            texture.playAnimationChannel(spriteSheet.attackRight)
-            texture.onCycleFinished = Runnable {
-                texture.loopAnimationChannel(spriteSheet.idleEast)
-            }
+    fun attack(type: AttackAnimationType) {
+        texture.playAnimationChannel(spriteSheet.getAttackAnimation(type, orientation))
+        texture.onCycleFinished = Runnable {
+            texture.loopAnimationChannel(spriteSheet.getIdleAnimation(orientation))
         }
     }
 }

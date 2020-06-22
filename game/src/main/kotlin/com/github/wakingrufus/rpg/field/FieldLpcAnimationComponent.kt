@@ -2,57 +2,53 @@ package com.github.wakingrufus.rpg.field
 
 import com.almasb.fxgl.entity.component.Component
 import com.almasb.fxgl.texture.AnimatedTexture
-import com.almasb.fxgl.texture.AnimationChannel
-import com.github.wakingrufus.rpg.AnimationType
-import com.github.wakingrufus.rpg.LPCSpriteSheet
-import com.github.wakingrufus.rpg.getAnimation
-import javafx.util.Duration
+import com.github.wakingrufus.rpg.sprites.LPCSpriteSheet
+import com.github.wakingrufus.rpg.sprites.characterSpriteSheet
 
-class FieldLpcAnimationComponent(name: String) : Component() {
-    private val lpc = LPCSpriteSheet(name)
-    private val texture: AnimatedTexture = AnimatedTexture(lpc.idleNorth)
+class FieldLpcAnimationComponent(val spriteSheet: LPCSpriteSheet) : Component() {
+    private val texture: AnimatedTexture = AnimatedTexture(spriteSheet.idleNorth)
 
     override fun onAdded() {
         entity.viewComponent.addChild(texture)
-        texture.loopAnimationChannel(lpc.idleNorth)
+        texture.loopAnimationChannel(spriteSheet.idleNorth)
     }
 
     fun walkNorth() {
-        if (texture.animationChannel != lpc.walkNorth
-                && texture.animationChannel != lpc.walkWest
-                && texture.animationChannel != lpc.walkEast) {
-            texture.playAnimationChannel(lpc.walkNorth)
+        if (texture.animationChannel != spriteSheet.walkNorth
+                && texture.animationChannel != spriteSheet.walkWest
+                && texture.animationChannel != spriteSheet.walkEast) {
+            texture.playAnimationChannel(spriteSheet.walkNorth)
             texture.onCycleFinished = Runnable {
-                texture.loopAnimationChannel(lpc.idleNorth)
+                texture.loopAnimationChannel(spriteSheet.idleNorth)
             }
         }
     }
 
     fun walkSouth(){
-        if (texture.animationChannel != lpc.walkSouth
-                && texture.animationChannel != lpc.walkWest
-                && texture.animationChannel != lpc.walkEast) {
-            texture.playAnimationChannel(lpc.walkSouth)
+        if (texture.animationChannel != spriteSheet.walkSouth
+                && texture.animationChannel != spriteSheet.walkWest
+                && texture.animationChannel != spriteSheet.walkEast) {
+            texture.playAnimationChannel(spriteSheet.walkSouth)
             texture.onCycleFinished = Runnable {
-                texture.loopAnimationChannel(lpc.idleNorth)
+                texture.loopAnimationChannel(spriteSheet.idleSouth)
             }
         }
     }
 
     fun walkWest(){
-        if (texture.animationChannel != lpc.walkWest) {
-            texture.playAnimationChannel(lpc.walkWest)
+        if (texture.animationChannel != spriteSheet.walkWest) {
+            texture.playAnimationChannel(spriteSheet.walkWest)
             texture.onCycleFinished = Runnable {
-                texture.loopAnimationChannel(lpc.idleWest)
+                texture.loopAnimationChannel(spriteSheet.idleWest)
             }
         }
     }
 
     fun walkEast(){
-        if (texture.animationChannel != lpc.walkEast) {
-            texture.playAnimationChannel(lpc.walkEast)
+        if (texture.animationChannel != spriteSheet.walkEast) {
+            texture.playAnimationChannel(spriteSheet.walkEast)
             texture.onCycleFinished = Runnable {
-                texture.loopAnimationChannel(lpc.idleEast)
+                texture.loopAnimationChannel(spriteSheet.idleEast)
             }
         }
     }

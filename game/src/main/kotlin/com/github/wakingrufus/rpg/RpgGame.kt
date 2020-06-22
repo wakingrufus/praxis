@@ -9,13 +9,16 @@ import com.almasb.fxgl.entity.getComponent
 import com.almasb.fxgl.input.Input
 import com.almasb.fxgl.input.UserAction
 import com.almasb.fxgl.logging.Logger
-import com.github.wakingrufus.praxis.PRAXIS_AREAS
+import com.github.wakingrufus.praxis.PraxisAreaDb
+import com.github.wakingrufus.praxis.PraxisSpriteDb.blueLongHawk
+import com.github.wakingrufus.praxis.PraxisSpriteDb.maleLight
 import com.github.wakingrufus.rpg.area.AreaLoader
 import com.github.wakingrufus.rpg.battle.BattleEngine
 import com.github.wakingrufus.rpg.battle.BattleStateKeys
 import com.github.wakingrufus.rpg.entities.EntityType
 import com.github.wakingrufus.rpg.entities.MyEntityFactory
 import com.github.wakingrufus.rpg.field.*
+import com.github.wakingrufus.rpg.sprites.characterSpriteSheet
 import javafx.scene.input.KeyCode
 import java.util.*
 import java.util.function.BiConsumer
@@ -44,6 +47,8 @@ class Game : GameApplication() {
     override fun initGameVars(vars: MutableMap<String?, Any?>) {
         vars["pixelsMoved"] = 0
         vars["debug"] = false
+        vars["mainSpriteSheet"] = characterSpriteSheet(base = maleLight, hat = blueLongHawk)
+        vars["pronouns"] = listOf("they","them","their","theirs")
         vars[BattleStateKeys.activePartyMember] = false
         vars[BattleStateKeys.turn] = 0
     }
@@ -51,7 +56,7 @@ class Game : GameApplication() {
     override fun initGame() {
         getGameWorld().addEntityFactory(entityFactory)
         areaLoader = AreaLoader(getGameWorld())
-        areaLoader.loadArea(PRAXIS_AREAS.badlands)
+        areaLoader.loadArea(PraxisAreaDb.badlands)
         player = getGameWorld().spawn("player").also {
             playerComponent = it.getComponent()
             getGameScene().viewport.bindToEntity(it, 1000.0, 500.0)

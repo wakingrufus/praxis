@@ -2,6 +2,7 @@ package com.github.wakingrufus.rpg.inventory
 
 import com.github.wakingrufus.rpg.RpgDsl
 import com.github.wakingrufus.rpg.battle.DamageType
+import com.github.wakingrufus.rpg.sprites.AttackAnimationType
 
 @RpgDsl
 open class RecipesDb {
@@ -9,8 +10,10 @@ open class RecipesDb {
         return ArmorRecipeBuilder(name, slot).apply(builder).build()
     }
 
-    fun weaponRecipe(name: String, damageType: DamageType, builder: WeaponRecipeBuilder.() -> Unit): WeaponRecipe {
-        return WeaponRecipeBuilder(name, damageType).apply(builder).build()
+    fun weaponRecipe(name: String, damageType: DamageType,
+                     attackAnimationType: AttackAnimationType,
+                     builder: WeaponRecipeBuilder.() -> Unit): WeaponRecipe {
+        return WeaponRecipeBuilder(name, damageType, attackAnimationType).apply(builder).build()
     }
 }
 
@@ -33,10 +36,12 @@ class ArmorRecipeBuilder(override val name: String, override val slot: Equipment
 }
 
 @RpgDsl
-class WeaponRecipeBuilder(override val name: String, val damageType: DamageType) : RecipeBuilder(name, EquipmentSlot.WEAPON) {
+class WeaponRecipeBuilder(override val name: String,
+                          val damageType: DamageType,
+                          val attackAnimationType: AttackAnimationType) : RecipeBuilder(name, EquipmentSlot.WEAPON) {
 
     override fun build(): WeaponRecipe {
-        return WeaponRecipe(name, damageType, ingredients)
+        return WeaponRecipe(name, damageType, attackAnimationType, ingredients)
     }
 }
 
@@ -53,12 +58,15 @@ sealed class Recipe(open val name: String,
     abstract fun craft(ingredients: List<CraftingMaterial>): Equipment
 }
 
-class WeaponRecipe(override val name: String, val damageType: DamageType, override val requiredIngredients: Map<MaterialType, Int>)
+class WeaponRecipe(override val name: String,
+                   val damageType: DamageType,
+                   val attackAnimationType: AttackAnimationType,
+                   override val requiredIngredients: Map<MaterialType, Int>)
     : Recipe(name, EquipmentSlot.WEAPON, requiredIngredients) {
 
     override fun craft(ingredients: List<CraftingMaterial>): Weapon {
-        return WeaponFactory(name, damageType).apply {
-            ingredients.forEach { this.apply(it.craftingEffect) }
+        return WeaponFactory(name, damageType, attackAnimationType).apply {
+            ingredients.mapNotNull { it.craftingEffects[slot] }.forEach { this.apply(it) }
         }.build()
     }
 }
@@ -70,7 +78,7 @@ class ArmorRecipe(override val name: String,
 
     override fun craft(ingredients: List<CraftingMaterial>): Armor {
         return ArmorFactory(name, slot).apply {
-            ingredients.forEach { this.apply(it.craftingEffect) }
+            ingredients.mapNotNull { it.craftingEffects[slot] }.forEach { this.apply(it) }
         }.build()
     }
 }
