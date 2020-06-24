@@ -6,8 +6,6 @@ import com.almasb.fxgl.app.MenuItem
 import com.almasb.fxgl.dsl.*
 import com.almasb.fxgl.entity.Entity
 import com.almasb.fxgl.entity.getComponent
-import com.almasb.fxgl.input.Input
-import com.almasb.fxgl.input.UserAction
 import com.almasb.fxgl.logging.Logger
 import com.github.wakingrufus.praxis.PraxisAreaDb
 import com.github.wakingrufus.praxis.PraxisSpriteDb.blueLongHawk
@@ -48,7 +46,7 @@ class Game : GameApplication() {
         vars["pixelsMoved"] = 0
         vars["debug"] = false
         vars["mainSpriteSheet"] = characterSpriteSheet(base = maleLight, hat = blueLongHawk)
-        vars["pronouns"] = listOf("they","them","their","theirs")
+        vars["pronouns"] = listOf("they", "them", "their", "theirs")
         vars[BattleStateKeys.activePartyMember] = false
         vars[BattleStateKeys.turn] = 0
     }
@@ -61,25 +59,23 @@ class Game : GameApplication() {
             playerComponent = it.getComponent()
             getGameScene().viewport.bindToEntity(it, 1000.0, 500.0)
         }
-
     }
 
     override fun initUI() {
-        FXGL.entityBuilder().type(EntityType.DIALOG).with(FieldInventoryMenuComponent()).buildAndAttach()
+
     }
 
     override fun initInput() {
-        val input: Input = FXGL.getInput()
         onKey(KeyCode.D, ::movePlayerEast)
         onKey(KeyCode.A, ::movePlayerWest)
         onKey(KeyCode.W, ::movePlayerNorth)
         onKey(KeyCode.S, ::movePlayerSouth)
-        input.addAction(object : UserAction("Activate") {
-            override fun onActionEnd() {
-                playerComponent?.activate()
-            }
-        }, KeyCode.E)
-        //     input.addAction(MenuAction(getGameState(), { gameMenu() }, { exitMenu() }), KeyCode.Q)
+        onKeyUp(KeyCode.Q, "Menu") {
+            FXGL.getSceneService().pushSubScene(FieldMenu())
+        }
+        onKeyUp(KeyCode.E, "Activate") {
+            playerComponent?.activate()
+        }
     }
 
     override fun initPhysics() {
@@ -87,6 +83,7 @@ class Game : GameApplication() {
                 BiConsumer { player: Entity?, enemy: Entity? ->
                     println("On Collision")
                     enemy?.also {
+                        // TODO: convert battle engine to subscene
                         FXGL.entityBuilder()
                                 .type(EntityType.BATTLE)
                                 .at(0.0, 0.0)

@@ -9,12 +9,16 @@ import com.almasb.fxgl.entity.component.Required
 import com.almasb.fxgl.entity.component.RequiredComponents
 import com.almasb.fxgl.entity.getComponent
 import com.almasb.fxgl.logging.Logger
+import com.almasb.fxgl.ui.ProgressBar
 import com.github.wakingrufus.rpg.battle.ability.AbilitiesComponent
 import com.github.wakingrufus.rpg.entities.EntityType
+import javafx.beans.property.DoubleProperty
+import javafx.beans.property.SimpleDoubleProperty
 import javafx.scene.Node
 import javafx.scene.layout.Background
 import javafx.scene.layout.BackgroundFill
 import javafx.scene.layout.HBox
+import javafx.scene.layout.VBox
 import javafx.scene.paint.Color
 import javafx.scene.text.Text
 
@@ -25,9 +29,7 @@ class PartyBattleComponent(val playerOrder: Int) : Component() {
     private val log = Logger.get(javaClass)
     lateinit var node: Node
     var infoNode: Node? = null
-    lateinit var nameNode: Text
-    lateinit var currentHp: Text
-    lateinit var maxHp: Text
+    val currentHp = SimpleDoubleProperty(0.0)
 
     fun triggerAction(battleActionChoice: AbilityActionChoice) {
         log.info("action chosen ${battleActionChoice.name}")
@@ -59,27 +61,46 @@ class PartyBattleComponent(val playerOrder: Int) : Component() {
     }
 
     override fun onAdded() {
-        nameNode = FXGL.getUIFactoryService().newText(this.entity.battleComponent().name)
-        currentHp = FXGL.getUIFactoryService().newText(this.entity.battleComponent().currentHp.toString())
-        maxHp = FXGL.getUIFactoryService().newText(this.entity.battleComponent().maxHp.toString())
+        val maxHp = this.entity.battleComponent().maxHp
+        currentHp.set(this.entity.battleComponent().currentHp.toDouble())
+        val nameNode = FXGL.getUIFactoryService().newText(this.entity.battleComponent().name)
+
+        val currentHpText = FXGL.getUIFactoryService().newText(currentHp.value.toInt().toString())
+        val maxHpText = FXGL.getUIFactoryService().newText(maxHp.toString())
+        val hpBar = ProgressBar().apply {
+            this.setMaxValue(maxHp.toDouble())
+           currentValueProperty().bind(currentHp)
+            this.setWidth(800.0)
+        }
+        val hpBox = VBox().apply {
+            children.add(HBox().apply {
+                children.add(currentHpText)
+                children.add(FXGL.getUIFactoryService().newText(" / "))
+                children.add(maxHpText)
+            })
+            children.add(hpBar)
+        }
         infoNode = HBox().apply {
             background = Background(BackgroundFill(Color.BLACK, null, null))
             translateX = 960.0
-            translateY = 800.0 + (playerOrder * 50)
-            minWidth = 480.0
-            maxWidth = 480.0
-            minHeight = 40.0
-            maxHeight = 40.0
+            translateY = 800.0 + (playerOrder * 80)
+            minWidth = 960.0
+            maxWidth = 960.0
+            minHeight = 80.0
+            maxHeight = 80.0
             children.add(nameNode)
-            children.add(currentHp)
-            children.add(maxHp)
+            children.add(hpBox)
         }.also {
             getGameScene().addUINode(it)
+        }
+        currentHp.addListener { observable, oldValue, newValue ->
+            currentHpText.text = newValue.toInt().toString()
+          //  hpBar.currentValue = newValue.toDouble()
         }
     }
 
     override fun onUpdate(tpf: Double) {
-        currentHp.text = this.entity.battleComponent().currentHp.toString()
+        currentHp.set(this.entity.battleComponent().currentHp.toDouble())
         if (entity.battleComponent().canTakeTurn()) {
             if (!getGameState().getBoolean(BattleStateKeys.activePartyMember)) {
                 val abilities = entity.getComponent<AbilitiesComponent>().getAbilities()
@@ -113,9 +134,6 @@ class PartyBattleComponent(val playerOrder: Int) : Component() {
         infoNode?.also {
             getGameScene().removeUINode(it)
         }
-        getGameScene().removeUINode(nameNode)
-        getGameScene().removeUINode(currentHp)
-        getGameScene().removeUINode(maxHp)
         getGameScene().removeUINode(node)
     }
 }
