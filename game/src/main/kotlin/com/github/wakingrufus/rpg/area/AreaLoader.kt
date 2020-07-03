@@ -5,10 +5,7 @@ import com.almasb.fxgl.entity.GameWorld
 import com.almasb.fxgl.physics.BoundingShape
 import com.almasb.fxgl.physics.HitBox
 import com.github.wakingrufus.rpg.entities.EntityType
-import com.github.wakingrufus.rpg.field.ActivateComponent
-import com.github.wakingrufus.rpg.field.FieldLpcAnimationComponent
-import com.github.wakingrufus.rpg.field.FieldMovementComponent
-import com.github.wakingrufus.rpg.field.SpawnerComponent
+import com.github.wakingrufus.rpg.field.*
 
 class AreaLoader(val gameWorld: GameWorld) {
 
@@ -22,6 +19,7 @@ class AreaLoader(val gameWorld: GameWorld) {
                     .type(EntityType.SPAWNER)
                     .at(it.x, it.y)
                     .with(SpawnerComponent(it))
+                    .with(FieldComponent())
                     .buildAndAttach()
         }
         area.npcs.forEach {

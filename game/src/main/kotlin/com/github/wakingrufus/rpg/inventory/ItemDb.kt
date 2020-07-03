@@ -8,7 +8,7 @@ import com.github.wakingrufus.rpg.sprites.AttackAnimationType
 open class ItemDb {
 
     fun consumable(name: String, ability: AbilityBuilder.() -> Unit): Consumable {
-        return Consumable(name, AbilityBuilder(AttackAnimationType.SPELL).apply(ability))
+        return Consumable(name, AbilityBuilder().apply { animation { AttackAnimationType.SPELL } }.apply(ability))
     }
 
     fun material(name: String, type: MaterialType, builder: CraftingMaterialBuilder.() -> Unit): CraftingMaterial {

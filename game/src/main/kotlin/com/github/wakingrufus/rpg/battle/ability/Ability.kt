@@ -5,20 +5,21 @@ import com.github.wakingrufus.rpg.battle.BattleComponent
 import com.github.wakingrufus.rpg.inventory.Consumable
 import com.github.wakingrufus.rpg.sprites.AttackAnimationType
 
-class Ability(val targetEffect: (BattleComponent) -> Unit = {},
-              val performerEffect: (BattleComponent) -> Unit = {},
-              val enemiesEffect: (BattleComponent) -> Unit = {},
-              val alliesEffect: (BattleComponent) -> Unit = {},
+class Ability(val targetEffect: (BattleComponent, BattleComponent) -> Unit = { _, _ -> },
+              val performerEffect: (BattleComponent) -> Unit = { },
+              val enemiesEffect: (BattleComponent, BattleComponent) -> Unit = { _, _ -> },
+              val alliesEffect: (BattleComponent, BattleComponent) -> Unit = { _, _ -> },
               val requiresTarget: Boolean = false,
               val consumes: Consumable?,
-              val animationType: AttackAnimationType)
+              val animationType: (BattleComponent) -> AttackAnimationType)
 
 @RpgDsl
-class AbilityBuilder(val animationType: AttackAnimationType) {
-    private var targetEffect: (BattleComponent) -> Unit = {}
-    private var alliesEffect: (BattleComponent) -> Unit = {}
-    private var enemiesEffect: (BattleComponent) -> Unit = {}
-    private var performerEffect: (BattleComponent) -> Unit = {}
+class AbilityBuilder {
+    private var targetEffect: (BattleComponent, BattleComponent) -> Unit = { _, _ -> }
+    private var alliesEffect: (BattleComponent, BattleComponent) -> Unit = { _, _ -> }
+    private var enemiesEffect: (BattleComponent, BattleComponent) -> Unit = { _, _ -> }
+    private var performerEffect: (BattleComponent) -> Unit = { }
+    private var animation: (BattleComponent) -> AttackAnimationType = { it.attackAnimationType() }
     private var requiresTarget: Boolean = false
     private var consumes: Consumable? = null
 
@@ -26,7 +27,11 @@ class AbilityBuilder(val animationType: AttackAnimationType) {
         consumes = consumable
     }
 
-    fun targetEffect(effect: (BattleComponent) -> Unit) {
+    fun animation(animation: (BattleComponent) -> AttackAnimationType) {
+        this.animation = animation
+    }
+
+    fun targetEffect(effect: (BattleComponent, BattleComponent) -> Unit) {
         targetEffect = effect
         requiresTarget = true
     }
@@ -35,11 +40,11 @@ class AbilityBuilder(val animationType: AttackAnimationType) {
         performerEffect = effect
     }
 
-    fun alliesEffect(effect: (BattleComponent) -> Unit) {
+    fun alliesEffect(effect: (BattleComponent, BattleComponent) -> Unit) {
         alliesEffect = effect
     }
 
-    fun enemiesEffect(effect: (BattleComponent) -> Unit) {
+    fun enemiesEffect(effect: (BattleComponent, BattleComponent) -> Unit) {
         enemiesEffect = effect
     }
 
@@ -50,10 +55,6 @@ class AbilityBuilder(val animationType: AttackAnimationType) {
                 performerEffect = performerEffect,
                 requiresTarget = requiresTarget,
                 consumes = consumes,
-                animationType = animationType)
+                animationType = animation)
     }
-}
-
-fun ability(type: AttackAnimationType, builder: AbilityBuilder.() -> Unit): Ability {
-    return AbilityBuilder(type).apply(builder).build()
 }

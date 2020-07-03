@@ -8,6 +8,9 @@ import com.almasb.fxgl.entity.Entity
 import com.almasb.fxgl.entity.getComponent
 import com.almasb.fxgl.logging.Logger
 import com.github.wakingrufus.praxis.PraxisAreaDb
+import com.github.wakingrufus.praxis.PraxisItemDb
+import com.github.wakingrufus.praxis.PraxisRecipesDb
+import com.github.wakingrufus.praxis.PraxisSkillDb
 import com.github.wakingrufus.praxis.PraxisSpriteDb.blueLongHawk
 import com.github.wakingrufus.praxis.PraxisSpriteDb.maleLight
 import com.github.wakingrufus.rpg.area.AreaLoader
@@ -16,6 +19,7 @@ import com.github.wakingrufus.rpg.battle.BattleStateKeys
 import com.github.wakingrufus.rpg.entities.EntityType
 import com.github.wakingrufus.rpg.entities.MyEntityFactory
 import com.github.wakingrufus.rpg.field.*
+import com.github.wakingrufus.rpg.party.PartyMember
 import com.github.wakingrufus.rpg.sprites.characterSpriteSheet
 import javafx.scene.input.KeyCode
 import java.util.*
@@ -45,10 +49,16 @@ class Game : GameApplication() {
     override fun initGameVars(vars: MutableMap<String?, Any?>) {
         vars["pixelsMoved"] = 0
         vars["debug"] = false
+        vars[BattleStateKeys.inBattle] = false
         vars["mainSpriteSheet"] = characterSpriteSheet(base = maleLight, hat = blueLongHawk)
         vars["pronouns"] = listOf("they", "them", "their", "theirs")
         vars[BattleStateKeys.activePartyMember] = false
         vars[BattleStateKeys.turn] = 0
+        vars["party"] = listOf(
+                PartyMember(name = "player 1", maxHp = 100, speed = 15,
+                        weapon = PraxisRecipesDb.ShortSword.craft(listOf(PraxisItemDb.Iron, PraxisItemDb.Iron, PraxisItemDb.Iron, PraxisItemDb.Oak, PraxisItemDb.Topaz)),
+                        skills = listOf(PraxisSkillDb.attack, PraxisSkillDb.pray)),
+                PartyMember(name = "player 2", maxHp = 80, speed = 18, skills = listOf(PraxisSkillDb.attack)))
     }
 
     override fun initGame() {

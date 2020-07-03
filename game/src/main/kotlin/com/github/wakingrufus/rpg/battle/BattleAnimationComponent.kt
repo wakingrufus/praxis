@@ -21,4 +21,8 @@ class BattleAnimationComponent(val spriteSheet: LPCSpriteSheet, var orientation:
             texture.loopAnimationChannel(spriteSheet.getIdleAnimation(orientation))
         }
     }
+
+    fun die(){
+        texture.playAnimationChannel(spriteSheet.die)
+    }
 }

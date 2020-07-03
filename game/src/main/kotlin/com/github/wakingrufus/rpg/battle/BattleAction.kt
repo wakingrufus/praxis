@@ -20,11 +20,12 @@ class AbilityActionChoice(override val name: String, val ability: Ability) : Bat
             ability.consumes?.let {
                 removeItemFromInventory(it)
             }
+            performer.entity.getComponent<BattleAnimationComponent>().attack(ability.animationType(performer))
             ability.performerEffect(performer)
-            allies.forEach { ability.alliesEffect(it) }
-            enemies.forEach { ability.enemiesEffect(it) }
-            target?.also { ability.targetEffect(it) }
-            performer.entity.getComponent<BattleAnimationComponent>().attack(ability.animationType)
+            allies.forEach { ability.alliesEffect(performer,it) }
+            enemies.forEach { ability.enemiesEffect(performer, it) }
+            target?.also { ability.targetEffect(performer,it) }
+
         }
     }
 }
@@ -33,12 +34,6 @@ class ChooseAbilityActionChoice(override val name: String, val choices: () -> Li
 
 fun chooseChoice(name: String, choices: () -> List<BattleActionChoice>): ChooseAbilityActionChoice {
     return ChooseAbilityActionChoice(name, choices)
-}
-
-fun abilityChoice(name: String,
-                  attackAnimationType: AttackAnimationType,
-                  builder: AbilityBuilder.() -> Unit): AbilityActionChoice {
-    return AbilityActionChoice(name = name, ability = AbilityBuilder(attackAnimationType).apply(builder).build())
 }
 
 fun consumableChoice(name: String, consumable: Consumable, builder: AbilityBuilder): AbilityActionChoice {

@@ -7,7 +7,7 @@ import com.github.wakingrufus.rpg.sprites.AttackAnimationType
 
 @RpgDsl
 open class AbilitiesDb {
-    fun ability(name: String, type: AttackAnimationType, builder: AbilityBuilder.() -> Unit): AbilityActionChoice {
-        return AbilityActionChoice(name = name, ability = AbilityBuilder(type).apply(builder).build())
+    fun ability(name: String, builder: AbilityBuilder.() -> Unit): AbilityActionChoice {
+        return AbilityActionChoice(name = name, ability = AbilityBuilder().apply(builder).build())
     }
 }
