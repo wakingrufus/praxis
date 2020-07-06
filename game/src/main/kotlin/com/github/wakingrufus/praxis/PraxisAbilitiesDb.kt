@@ -10,9 +10,10 @@ import com.github.wakingrufus.rpg.sprites.AttackAnimationType
 object PraxisAbilitiesDb : AbilitiesDb() {
     private val log = Logger.get(javaClass)
     val attack: (amt: Int, damageType: DamageType, animationType: AttackAnimationType) -> AbilityActionChoice = { amt, type, animation ->
-        ability("attack", animation) {
-            targetEffect {
-                it.takeDamage(amt, type)
+        ability("attack") {
+            animation { animation }
+            targetEffect { performer, target ->
+                target.takeDamage(amt, type)
             }
             performerEffect {
                 this@PraxisAbilitiesDb.log.info("${it.entity.battleComponent().name} attacks for $amt $type damage")

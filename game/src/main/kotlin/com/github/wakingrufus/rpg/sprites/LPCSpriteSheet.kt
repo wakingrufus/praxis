@@ -61,6 +61,7 @@ class LPCSpriteSheet(val image: Image) {
     val shootWest = of(17, 13)
     val shootSouth = of(18, 13)
     val shootEast = of(19, 13)
+    val die = of(20, 6)
     private fun of(row: Int, frames: Int): AnimationChannel {
         return AnimationChannel(image, 13, 64, 64, Duration.seconds(1.0), 13 * row, (13 * row) + frames - 1)
     }

@@ -15,7 +15,15 @@ object PraxisAreaDb : AreaDb() {
     val badlands = area("Badlands", "map.tmx") {
         spawner("Skeleton Archer", skeletonWithBow, 500.0, 500.0, 200, 1, 10.0) {
             enemy("Skeleton Archer A", 100, skeletonWithBow, 10,
-                    singleAbilityRandomTarget(attack(3, DamageType.RANGE, AttackAnimationType.SHOOT)))
+                    singleAbilityRandomTarget(attack(3, RANGE, AttackAnimationType.SHOOT)))
+            loot {
+                item(90, Potion)
+                item(10, Potion)
+            }
+        }
+        spawner("Skeleton Archer", skeletonWithBow, 500.0, 600.0, 200, 2, 10.0) {
+            enemy("Skeleton Archer A", 100, skeletonWithBow, 10,
+                    singleAbilityRandomTarget(attack(3, RANGE, AttackAnimationType.SHOOT)))
             loot {
                 item(90, Potion)
                 item(10, Potion)

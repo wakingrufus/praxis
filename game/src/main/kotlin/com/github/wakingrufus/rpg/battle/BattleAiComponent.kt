@@ -11,7 +11,7 @@ class BattleAiComponent(val ai: (self: Entity, gameWorld: GameWorld) -> BattleAc
 
     @Override
     override fun onUpdate(tpf: Double) {
-        if (entity.battleComponent().queueIsEmpty()) {
+        if (entity.battleComponent().queueIsEmpty() && entity.battleComponent().isActive()) {
             entity.battleComponent().queueAction(ai(this.entity, getGameWorld()))
         }
     }

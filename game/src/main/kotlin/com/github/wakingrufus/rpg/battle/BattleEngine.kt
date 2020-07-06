@@ -7,16 +7,15 @@ import com.almasb.fxgl.entity.Entity
 import com.almasb.fxgl.entity.component.Component
 import com.almasb.fxgl.entity.getComponent
 import com.almasb.fxgl.logging.Logger
-import com.github.wakingrufus.praxis.PraxisItemDb
-import com.github.wakingrufus.praxis.PraxisRecipesDb.ShortSword
-import com.github.wakingrufus.rpg.battle.ability.*
+import com.github.wakingrufus.rpg.battle.BattleStateKeys.inBattle
+import com.github.wakingrufus.rpg.battle.ability.AbilitiesComponent
+import com.github.wakingrufus.rpg.battle.ability.ItemComponent
 import com.github.wakingrufus.rpg.enemies.EnemyParty
 import com.github.wakingrufus.rpg.entities.EntityType
 import com.github.wakingrufus.rpg.field.MonsterAggroComponent
-import com.github.wakingrufus.rpg.field.MonsterDespawnEvent
 import com.github.wakingrufus.rpg.inventory.addItemToInventory
+import com.github.wakingrufus.rpg.party.PartyMember
 import com.github.wakingrufus.rpg.sprites.SpriteOrientation
-import com.github.wakingrufus.rpg.sprites.characterSpriteSheet
 import javafx.scene.image.ImageView
 
 class BattleEngine(val gameScene: GameScene, val enemy: Entity) : Component() {
@@ -26,7 +25,7 @@ class BattleEngine(val gameScene: GameScene, val enemy: Entity) : Component() {
     private lateinit var battleParty: EnemyParty
 
     override fun onAdded() {
-        gameScene.gameWorld.properties.setValue("battle", true)
+        gameScene.gameWorld.properties.setValue(inBattle, true)
         gameScene.gameWorld.removeEntity(enemy)
         worldEnemy = enemy
         battleView = GameView(ImageView(getAssetLoader().loadImage("battle_valley.png")).apply {
@@ -44,37 +43,39 @@ class BattleEngine(val gameScene: GameScene, val enemy: Entity) : Component() {
                             .zIndex(2)
                             .with(BattleComponent(enemy.name, enemy.maxHp, enemy.speed))
                             .with(BattleAiComponent(enemy.ai))
-                            .with(EnemyBattleComponent())
                             .with(BattleAnimationComponent(enemy.sprite, SpriteOrientation.WEST))
                             .buildAndAttach()
                 }
-        val partyEntity = FXGL.entityBuilder()
-                .type(EntityType.PARTY)
-                .at(100.0, 500.0)
-                .zIndex(2)
-                .with(BattleAnimationComponent(getGameState().getObject("mainSpriteSheet"), SpriteOrientation.EAST))
-                .with(BattleComponent("Player", 100, 15))
-                .with(EquipmentComponent(
-                        weapon = ShortSword.craft(listOf(PraxisItemDb.Iron, PraxisItemDb.Iron, PraxisItemDb.Iron, PraxisItemDb.Oak, PraxisItemDb.Topaz))))
-                .with(HealPowerComponent(1))
-                .with(AbilitiesComponent())
-                .with(PrayComponent())
-                .with(PartyBattleComponent(0))
-                .with(ItemComponent())
-                .buildAndAttach()
-        gameScene.viewport.bindToEntity(partyEntity, partyEntity.x, partyEntity.y)
+        val partyEntities = getGameState().getObject<List<PartyMember>>("party").mapIndexed { index, member ->
+            FXGL.entityBuilder()
+                    .type(EntityType.PARTY)
+                    .at(100.0, 500.0 + (index * 50))
+                    .zIndex(2)
+                    .with(BattleAnimationComponent(getGameState().getObject("mainSpriteSheet"), SpriteOrientation.EAST))
+                    .with(BattleComponent(member.name, member.maxHp, member.speed, weapon = member.weapon, helm = member.armor,
+                            startingStatusEffects = member.skills.flatMap { it.statusEffects }))
+                    .with(AbilitiesComponent(member.skills.flatMap { it.actions }))
+                    .with(PartyBattleComponent(index))
+                    .with(ItemComponent())
+                    .buildAndAttach()
+        }
+        with(partyEntities.first()) {
+            gameScene.viewport.bindToEntity(this, x, y)
+        }
+
         getGameState().intProperty(BattleStateKeys.turn).set(1)
     }
 
     @Override
     override fun onUpdate(tpf: Double) {
-        if (getGameWorld().getEntitiesByType(EntityType.ENEMY_PARTY).isEmpty()) {
+        if (getGameWorld().getEntitiesByType(EntityType.ENEMY_PARTY).none { it.battleComponent().isActive() }) {
             getGameWorld().removeEntity(this.entity)
         }
         val allBattleEntities = getGameWorld().getEntitiesByType(EntityType.PARTY)
                 .plus(getGameWorld().getEntitiesByType(EntityType.ENEMY_PARTY))
         val currentTurnBattleComponents = allBattleEntities
                 .map { it.battleComponent() }
+                .filter(BattleComponent::isActive)
                 .filter(BattleComponent::canTakeTurn)
         if (currentTurnBattleComponents.all { !it.queueIsEmpty() }) {
             currentTurnBattleComponents
@@ -92,16 +93,19 @@ class BattleEngine(val gameScene: GameScene, val enemy: Entity) : Component() {
         val loot = battleParty.lootTable.rollLoot()
         FXGL.getDialogService().showMessageBox("Victory!\nYou Obtained:\n" + loot.joinToString("\n") { it.name })
         loot.forEach { addItemToInventory(it, 1) }
-        getEventBus().fireEvent(MonsterDespawnEvent(MonsterDespawnEvent.ANY, worldEnemy))
+        getGameWorld().getEntitiesByType(EntityType.ENEMY_PARTY)
+                .forEach { getGameWorld().removeEntity(it) }
         getGameWorld().getEntitiesByType(EntityType.PARTY)
                 .forEach { getGameWorld().removeEntities(it) }
         gameScene.removeGameView(battleView)
         getGameState().setValue(BattleStateKeys.activePartyMember, false)
         getGameScene().viewport.bindToEntity(getGameWorld().getEntitiesByType(EntityType.PLAYER).first(), 1000.0, 500.0)
+        gameScene.gameWorld.properties.setValue(inBattle, false)
     }
 }
 
 object BattleStateKeys {
+    const val inBattle = "battle"
     const val turn = "battle.turn"
     const val activePartyMember = "battle.activePartyMember"
 }

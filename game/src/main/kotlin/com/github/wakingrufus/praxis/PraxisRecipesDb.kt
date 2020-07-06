@@ -13,7 +13,7 @@ object Augment : MaterialType("Augment")
 object Wood : MaterialType("Wood")
 
 object PraxisRecipesDb : RecipesDb() {
-    val ShortSword = weaponRecipe("Short Sword", DamageType.MELEE, AttackAnimationType.SLASH) {
+    val ShortSword = weaponRecipe("Short Sword", MELEE, AttackAnimationType.SLASH) {
         add(3, Metal)
         add(1, Wood)
         add(1, Augment)

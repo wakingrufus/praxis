@@ -17,8 +17,6 @@ class SpawnerComponent(val spawner: Spawner) : Component() {
     private var spawnedEntity: Entity? = null
     private var respawnTimer: Double = 0.0
 
-    lateinit var handler: EventHandler<MonsterDespawnEvent>
-
     @Override
     override fun onUpdate(tpf: Double) {
         respawnTimer += tpf
@@ -30,23 +28,11 @@ class SpawnerComponent(val spawner: Spawner) : Component() {
                     .at(spawner.x, spawner.y)
                     .bbox(HitBox(BoundingShape.box(32.0, 56.0)))
                     .collidable()
+                    .with(FieldComponent())
                     .with(FieldLpcAnimationComponent(spawner.sprite))
                     .with(FieldMovementComponent(spawner.speed))
                     .with(MonsterAggroComponent(spawner.name, spawner.aggroRange, spawner.party))
                     .buildAndAttach()
-            pause()
-            getEventBus().addEventHandler(MonsterDespawnEvent.ANY, handler)
-        }
-    }
-
-    init {
-        handler = EventHandler<MonsterDespawnEvent> { event: MonsterDespawnEvent ->
-            if (spawnedEntity == event.entity) {
-                log.info("resuming spawner ${spawner.name}")
-                getEventBus().removeEventHandler(MonsterDespawnEvent.ANY, handler)
-                respawnTimer = 0.0
-                resume()
-            }
         }
     }
 }

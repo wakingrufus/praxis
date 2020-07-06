@@ -11,34 +11,34 @@ object PraxisItemDb : ItemDb() {
 
     val Iron = material("Iron", Metal) {
         on(EquipmentSlot.WEAPON){
-            attack(2, DamageType.MELEE)
-            attack(2, DamageType.RANGE)
+            attack(2, MELEE)
+            attack(2, RANGE)
         }
     }
 
     val Stone = material("Stone", Metal){
         on(EquipmentSlot.WEAPON){
-            attack(1, DamageType.MELEE)
-            attack(1, DamageType.RANGE)
+            attack(1, MELEE)
+            attack(1, RANGE)
         }
     }
 
     val Bronze = material("Bronze", Metal) {
-        on(EquipmentSlot.WEAPON) { attack(3, DamageType.MELEE) }
+        on(EquipmentSlot.WEAPON) { attack(3, MELEE) }
     }
 
     val Oak = material("Oak", Wood) {
-        on(EquipmentSlot.WEAPON) { attack(2, DamageType.RANGE) }
-        on(EquipmentSlot.WEAPON) { attack(1, DamageType.MELEE) }
+        on(EquipmentSlot.WEAPON) { attack(2, RANGE) }
+        on(EquipmentSlot.WEAPON) { attack(1, MELEE) }
     }
 
     val Topaz = material("Topaz", Augment) {
-        on(EquipmentSlot.ACCESSORY) { attack(1, DamageType.FIRE) }
+        on(EquipmentSlot.ACCESSORY) { attack(1, FIRE) }
         on(EquipmentSlot.WEAPON) { proc(10, PraxisStatusEffectDb.Burn) }
-        on(EquipmentSlot.ARMOR) { defense(1, DamageType.FIRE) }
+        on(EquipmentSlot.ARMOR) { defense(1, FIRE) }
     }
 
     val Cotton = material("Cotton", Cloth){
-        on(EquipmentSlot.ARMOR) { defense(1, DamageType.WATER)}
+        on(EquipmentSlot.ARMOR) { defense(1, ICE)}
     }
 }
