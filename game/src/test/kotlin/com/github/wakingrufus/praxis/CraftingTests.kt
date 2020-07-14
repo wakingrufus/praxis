@@ -18,6 +18,6 @@ internal class CraftingTests {
         assertThat(ShortSword.canCraft(listOf(Iron, Iron, Iron, Oak, Topaz))).isTrue()
         val shortSword = ShortSword.craft(listOf(Iron, Iron, Iron, Oak, Topaz))
         assertThat(shortSword.slot).isEqualTo(EquipmentSlot.WEAPON)
-        assertThat(shortSword.primaryDamageType).isEqualTo(DamageType.MELEE)
+        assertThat(shortSword.primaryDamageType).isEqualTo(MELEE)
     }
 }

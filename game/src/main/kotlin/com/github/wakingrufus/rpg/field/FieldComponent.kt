@@ -1,6 +1,6 @@
 package com.github.wakingrufus.rpg.field
 
-import com.almasb.fxgl.dsl.getGameWorld
+import com.almasb.fxgl.dsl.getbp
 import com.almasb.fxgl.entity.component.Component
 import com.github.wakingrufus.rpg.battle.BattleStateKeys
 import javafx.beans.value.ChangeListener
@@ -15,10 +15,10 @@ class FieldComponent : Component() {
     }
 
     override fun onAdded() {
-        getGameWorld().properties.booleanProperty(BattleStateKeys.inBattle).addListener(listener)
+        getbp(BattleStateKeys.inBattle).addListener(listener)
     }
 
     override fun onRemoved() {
-        getGameWorld().properties.booleanProperty(BattleStateKeys.inBattle).removeListener(listener)
+        getbp(BattleStateKeys.inBattle).removeListener(listener)
     }
 }

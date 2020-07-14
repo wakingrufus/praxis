@@ -101,18 +101,12 @@ class PartyBattleComponent(val playerOrder: Int) : Component() {
 
     override fun onUpdate(tpf: Double) {
         currentHp.set(this.entity.battleComponent().currentHp.toDouble())
-        if (entity.battleComponent().canTakeTurn()) {
+        if (entity.battleComponent().isActive() && !entity.battleComponent().hasNextAction()) {
             if (!getGameState().getBoolean(BattleStateKeys.activePartyMember)) {
                 val abilities = entity.getComponent<AbilitiesComponent>().getAbilities()
                 getGameState().setValue(BattleStateKeys.activePartyMember, true)
                 promptForChoice(abilities)
             }
-        }
-        if (getGameWorld().getEntitiesByType(EntityType.BATTLE).isEmpty()) {
-            infoNode?.also {
-                getGameScene().removeUINode(it)
-            }
-
         }
     }
 

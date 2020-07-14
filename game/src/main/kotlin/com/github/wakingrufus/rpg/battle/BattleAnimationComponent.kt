@@ -24,5 +24,8 @@ class BattleAnimationComponent(val spriteSheet: LPCSpriteSheet, var orientation:
 
     fun die(){
         texture.playAnimationChannel(spriteSheet.die)
+        texture.onCycleFinished = Runnable {
+            texture.loopAnimationChannel(spriteSheet.dieIdle)
+        }
     }
 }

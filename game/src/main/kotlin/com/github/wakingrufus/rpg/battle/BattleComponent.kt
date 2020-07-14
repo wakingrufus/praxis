@@ -6,6 +6,7 @@ import com.almasb.fxgl.dsl.getUIFactoryService
 import com.almasb.fxgl.dsl.runOnce
 import com.almasb.fxgl.entity.Entity
 import com.almasb.fxgl.entity.component.Component
+import com.almasb.fxgl.entity.component.Required
 import com.almasb.fxgl.entity.getComponent
 import com.almasb.fxgl.logging.Logger
 import com.github.wakingrufus.rpg.inventory.Armor
@@ -18,18 +19,27 @@ import javafx.util.Duration
 import java.lang.Integer.max
 import java.lang.Integer.min
 
+@Required(BattleAnimationComponent::class)
 class BattleComponent(val name: String, val maxHp: Int, var speed: Int, var currentHp: Int = maxHp,
                       val helm: Armor? = null, val weapon: Weapon? = null,
                       private val startingStatusEffects: List<StatusEffect> = listOf()) : Component() {
     private val log = Logger.get(javaClass)
     private val statusEffects = mutableListOf<StatusEffect>()
     private var active = true
-    private val actionQueue = mutableListOf<BattleAction>()
+    private var nextAction: BattleAction? = null
+    private var turnCounter = 0
 
-    fun popAction(): BattleAction? {
-        return actionQueue.firstOrNull()?.also {
-            actionQueue.remove(it)
+    fun nextAction(): BattleAction? {
+        statusEffects.forEach {
+            it.periodic(this)
         }
+        return nextAction.also {
+            nextAction = null
+        }
+    }
+
+    fun hasNextAction(): Boolean {
+        return nextAction != null
     }
 
     override fun onAdded() {
@@ -37,8 +47,13 @@ class BattleComponent(val name: String, val maxHp: Int, var speed: Int, var curr
     }
 
     override fun onUpdate(tpf: Double) {
-        statusEffects.forEach {
-            it.periodic(this)
+        if(isActive()) {
+            if (currentHp <= 0) {
+                log.info("$name dies.")
+                entity.getComponent<BattleAnimationComponent>().die()
+                applyStatus(KO)
+                nextAction = null
+            }
         }
     }
 
@@ -57,6 +72,7 @@ class BattleComponent(val name: String, val maxHp: Int, var speed: Int, var curr
     }
 
     fun deactivate() {
+        log.info("setting ${this.name} to inactive")
         active = false
     }
 
@@ -65,22 +81,24 @@ class BattleComponent(val name: String, val maxHp: Int, var speed: Int, var curr
     }
 
     fun queueAction(action: BattleAction) {
-        actionQueue.add(action)
+        if(isActive()) {
+            nextAction = action
+        }
     }
 
-    fun queueIsEmpty(): Boolean = actionQueue.isEmpty()
     fun canTakeTurn(): Boolean = active && getGameState().getInt(BattleStateKeys.turn) % (1000 / speed) == 0
     fun takeDamage(value: Int, type: DamageType) {
         val modifier = defenseModifier(type)
         val adjustedAmt = value - modifier
-        log.info("${entity.battleComponent().name} takes $adjustedAmt $type damage")
         currentHp = max(0, currentHp - adjustedAmt)
+        log.info("${entity.battleComponent().name} takes $adjustedAmt $type damage. new HP=$currentHp")
         displayDamage(adjustedAmt, type.color)
-        if (currentHp <= 0) {
-            entity.getComponent<BattleAnimationComponent>().die()
-            applyStatus(KO)
-            actionQueue.clear()
-        }
+//        if (currentHp <= 0) {
+//            log.info("$name dies.")
+//            entity.getComponent<BattleAnimationComponent>().die()
+//            applyStatus(KO)
+//            nextAction = null
+//        }
     }
 
     fun heal(value: Int) {
