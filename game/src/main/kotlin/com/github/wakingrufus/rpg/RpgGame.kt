@@ -48,7 +48,7 @@ class Game : GameApplication() {
 
     override fun initGameVars(vars: MutableMap<String?, Any?>) {
         vars["pixelsMoved"] = 0
-        vars["debug"] = false
+        vars["debug"] = true
         vars[BattleStateKeys.inBattle] = false
         vars["mainSpriteSheet"] = characterSpriteSheet(base = maleLight, hat = blueLongHawk)
         vars["pronouns"] = listOf("they", "them", "their", "theirs")
@@ -58,7 +58,8 @@ class Game : GameApplication() {
                 PartyMember(name = "player 1", maxHp = 100, speed = 15,
                         weapon = PraxisRecipesDb.ShortSword.craft(listOf(PraxisItemDb.Iron, PraxisItemDb.Iron, PraxisItemDb.Iron, PraxisItemDb.Oak, PraxisItemDb.Topaz)),
                         skills = listOf(PraxisSkillDb.attack, PraxisSkillDb.pray)),
-                PartyMember(name = "player 2", maxHp = 80, speed = 18, skills = listOf(PraxisSkillDb.attack)))
+                PartyMember(name = "player 2", maxHp = 80, speed = 18,
+                        skills = listOf(PraxisSkillDb.attack, PraxisSkillDb.nuke, PraxisSkillDb.item)))
     }
 
     override fun initGame() {
@@ -67,7 +68,7 @@ class Game : GameApplication() {
         areaLoader.loadArea(PraxisAreaDb.badlands)
         player = getGameWorld().spawn("player").also {
             playerComponent = it.getComponent()
-            getGameScene().viewport.bindToEntity(it, 1000.0, 500.0)
+            getGameScene().viewport.bindToEntity(it, getGameScene().viewport.width / 2, getGameScene().viewport.height / 2)
         }
     }
 
@@ -92,17 +93,26 @@ class Game : GameApplication() {
         FXGL.onCollision(EntityType.PLAYER, EntityType.ENEMY,
                 BiConsumer { player: Entity?, enemy: Entity? ->
                     println("On Collision")
+                    getGameScene().viewport.zoomProperty().set(1.0)
                     enemy?.also {
-                        // TODO: convert battle engine to subscene
                         FXGL.entityBuilder()
                                 .type(EntityType.BATTLE)
                                 .at(0.0, 0.0)
-                                .with(BattleEngine(getGameScene(), it))
+                                .with(BattleEngine(getGameScene(), it.getComponent()))
                                 .buildAndAttach()
+                        getGameWorld().removeEntity(it)
                     }
                 })
+        FXGL.onCollision(EntityType.PLAYER, EntityType.CAMERA,
+                BiConsumer { player, camera ->
+                    val zoom = camera.getComponent<CameraComponent>().zoomLevel
+                    getGameScene().viewport.zoomProperty().set(zoom)
+                    getGameScene().viewport.bindToEntity(player,
+                            getGameScene().viewport.width / (2 * zoom), getGameScene().viewport.height / (2 * zoom))
+                    getGameScene().viewport.focusOn(player)
+                }
+        )
     }
-
 }
 
 fun main(args: Array<String>) {

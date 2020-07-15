@@ -62,9 +62,12 @@ class LPCSpriteSheet(val image: Image) {
     val shootSouth = of(18, 13)
     val shootEast = of(19, 13)
     val die = of(20, 6)
-    private fun of(row: Int, frames: Int): AnimationChannel {
-        return AnimationChannel(image, 13, 64, 64, Duration.seconds(1.0), 13 * row, (13 * row) + frames - 1)
+    val dieIdle = of(20, 6, 5)
+
+    private fun of(row: Int, frames: Int, startFrame: Int = 0): AnimationChannel {
+        return AnimationChannel(image, 13, 64, 64, Duration.seconds(1.0), 13 * row + startFrame, (13 * row) + frames - 1)
     }
+
 
     fun getIdleAnimation(orientation: SpriteOrientation): AnimationChannel {
         return when (orientation) {

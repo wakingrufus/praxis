@@ -32,10 +32,6 @@ class AbilityActionChoice(override val name: String, val ability: Ability) : Bat
 
 class ChooseAbilityActionChoice(override val name: String, val choices: () -> List<BattleActionChoice>) : BattleActionChoice(name)
 
-fun chooseChoice(name: String, choices: () -> List<BattleActionChoice>): ChooseAbilityActionChoice {
-    return ChooseAbilityActionChoice(name, choices)
-}
-
 fun consumableChoice(name: String, consumable: Consumable, builder: AbilityBuilder): AbilityActionChoice {
     return AbilityActionChoice(name = name, ability = builder.apply { consumes(consumable) }.build())
 }
